@@ -81,7 +81,7 @@ function HistoryPage() {
                     borderRadius: 12,
                     fontSize: 12,
                   }}
-                  formatter={(v: number) => [`${v} W`, "กำลัง"]}
+                  formatter={(v: unknown) => [`${v} W`, "กำลัง"] as [string, string]}
                 />
                 <Area type="monotone" dataKey="y" stroke="oklch(0.85 0.18 75)" strokeWidth={2} fill="url(#hg)" />
               </AreaChart>

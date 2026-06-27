@@ -158,7 +158,7 @@ function Dashboard() {
                     fontSize: 12,
                   }}
                   labelFormatter={(h) => `${h}:00`}
-                  formatter={(v: number) => [`${v} W`, "กำลัง"]}
+                  formatter={(v: unknown) => [`${v} W`, "กำลัง"] as [string, string]}
                 />
                 <Area type="monotone" dataKey="power" stroke="oklch(0.85 0.18 75)" strokeWidth={2} fill="url(#g1)" />
               </AreaChart>
