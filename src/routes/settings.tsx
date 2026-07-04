@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Battery, Zap, Lightbulb, Power, Clock, Check } from "lucide-react";
+import { Battery, Zap, Lightbulb, Power, Clock, Check, AlertCircle, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { Slider } from "@/components/ui/slider";
@@ -19,15 +19,16 @@ export const Route = createFileRoute("/settings")({
       { name: "description", content: "ตั้งค่าแบตเตอรี่ แรงดัน โหลด และตัวจับเวลา" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(deviceSettingsQuery),
   component: SettingsPage,
 });
 
 function SettingsPage() {
-  const { data } = useSuspenseQuery(deviceSettingsQuery);
+  const q = useQuery(deviceSettingsQuery);
   const qc = useQueryClient();
-  const [s, setS] = useState<DeviceSettings>(data);
-  useEffect(() => setS(data), [data]);
+  const [s, setS] = useState<DeviceSettings | null>(q.data ?? null);
+  useEffect(() => {
+    if (q.data) setS(q.data);
+  }, [q.data]);
 
   const save = useMutation({
     mutationFn: saveDeviceSettings,
@@ -35,10 +36,39 @@ function SettingsPage() {
       toast.success("บันทึกการตั้งค่าแล้ว");
       qc.invalidateQueries({ queryKey: ["tuya"] });
     },
+    onError: (e: Error) => toast.error(e.message || "บันทึกไม่สำเร็จ"),
   });
 
+  if (!s) {
+    return (
+      <AppShell>
+        <PageHeader title="ตั้งค่า" />
+        <div className="grid min-h-[50vh] place-items-center px-5 text-sm text-muted-foreground">
+          {q.isError ? (
+            <div className="max-w-sm rounded-3xl bg-surface p-6 text-center">
+              <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
+              <p className="mt-3 text-sm font-semibold">โหลดค่าจากอุปกรณ์ไม่สำเร็จ</p>
+              <p className="mt-1 text-xs text-muted-foreground break-words">{(q.error as Error)?.message}</p>
+              <button
+                onClick={() => q.refetch()}
+                className="mt-4 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+              >
+                ลองใหม่
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              กำลังโหลดค่า...
+            </div>
+          )}
+        </div>
+      </AppShell>
+    );
+  }
+
   const update = <K extends keyof DeviceSettings>(k: K, v: DeviceSettings[K]) =>
-    setS((p) => ({ ...p, [k]: v }));
+    setS((p) => (p ? { ...p, [k]: v } : p));
 
   return (
     <AppShell>
