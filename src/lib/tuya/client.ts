@@ -1,46 +1,44 @@
 import { queryOptions } from "@tanstack/react-query";
-import { mockStatus, mockSettings, mockInfo } from "./mock";
+import {
+  getDeviceStatusFn,
+  getDeviceSettingsFn,
+  getDeviceInfoFn,
+  saveDeviceSettingsFn,
+  restartDeviceFn,
+  getPowerHistoryFn,
+} from "./api.functions";
 import type { DeviceSettings } from "./types";
 
-/**
- * Tuya Cloud API client placeholder.
- * แทนที่ฟังก์ชันเหล่านี้ด้วยการเรียก Tuya OpenAPI ผ่าน server function
- * (ต้องเปิด Lovable Cloud + เก็บ Access ID / Secret) เมื่อพร้อมเชื่อมต่อจริง
- */
-
-const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-export async function fetchDeviceStatus() {
-  await delay(120);
-  return mockStatus;
-}
-export async function fetchDeviceSettings() {
-  await delay(120);
-  return mockSettings;
-}
-export async function fetchDeviceInfo() {
-  await delay(120);
-  return mockInfo;
-}
-export async function saveDeviceSettings(_s: DeviceSettings) {
-  await delay(300);
-  return { ok: true };
-}
-export async function restartDevice() {
-  await delay(400);
-  return { ok: true };
-}
+/** Polling interval for live device data (ms). */
+export const REFRESH_MS = 32_000;
 
 export const deviceStatusQuery = queryOptions({
   queryKey: ["tuya", "status"],
-  queryFn: fetchDeviceStatus,
-  refetchInterval: 5000,
+  queryFn: () => getDeviceStatusFn(),
+  refetchInterval: REFRESH_MS,
+  refetchIntervalInBackground: false,
+  staleTime: REFRESH_MS / 2,
 });
+
 export const deviceSettingsQuery = queryOptions({
   queryKey: ["tuya", "settings"],
-  queryFn: fetchDeviceSettings,
+  queryFn: () => getDeviceSettingsFn(),
+  staleTime: 60_000,
 });
+
 export const deviceInfoQuery = queryOptions({
   queryKey: ["tuya", "info"],
-  queryFn: fetchDeviceInfo,
+  queryFn: () => getDeviceInfoFn(),
+  staleTime: 5 * 60_000,
 });
+
+export const powerHistoryQuery = (range: "day" | "week" | "month") =>
+  queryOptions({
+    queryKey: ["tuya", "history", range],
+    queryFn: () => getPowerHistoryFn({ data: { range } }),
+    refetchInterval: range === "day" ? REFRESH_MS * 2 : 5 * 60_000,
+    staleTime: REFRESH_MS,
+  });
+
+export const saveDeviceSettings = (s: DeviceSettings) => saveDeviceSettingsFn({ data: s });
+export const restartDevice = () => restartDeviceFn();
