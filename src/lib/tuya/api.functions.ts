@@ -144,7 +144,7 @@ export const getDeviceInfoFn = createServerFn({ method: "GET" }).handler(async (
 });
 
 export const saveDeviceSettingsFn = createServerFn({ method: "POST" })
-  .inputValidator((input: DeviceSettings) => input)
+  .validator((input: DeviceSettings) => input)
   .handler(async ({ data }) => {
     const { tuyaRequest, getDeviceId } = await import("./server");
     const id = getDeviceId();
@@ -180,7 +180,7 @@ export const restartDeviceFn = createServerFn({ method: "POST" }).handler(async 
 
 /** Battery power history via Tuya device logs (event type 7 = data-point report). */
 export const getPowerHistoryFn = createServerFn({ method: "GET" })
-  .inputValidator((input: { range: "day" | "week" | "month" }) => input)
+  .validator((input: { range: "day" | "week" | "month" }) => input)
   .handler(async ({ data }) => {
     const { tuyaRequest, getDeviceId } = await import("./server");
     const id = getDeviceId();
