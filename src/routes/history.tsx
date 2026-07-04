@@ -131,7 +131,7 @@ function HistoryPage() {
             label="เฉลี่ย"
             value={series.length ? `${(series.reduce((a, b) => a + b.y, 0) / series.length).toFixed(1)} W` : "-"}
           />
-          <Stat label="อุณหภูมิ" value={`${status.data.temperature}°C`} />
+          <Stat label="อุณหภูมิ" value={status.data ? `${status.data.temperature}°C` : "-"} />
         </div>
       </div>
     </AppShell>
