@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { RefreshCw, Sun, BatteryCharging, Lightbulb, Thermometer, Zap, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip } from "recharts";
 import { AppShell } from "@/components/app-shell";
@@ -13,7 +13,6 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "ดูค่าแผงโซลาร์ แบตเตอรี่ และโหลดแบบเรียลไทม์" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(deviceStatusQuery),
   component: Dashboard,
 });
 
@@ -25,12 +24,15 @@ const stateLabel: Record<string, { th: string; tone: string }> = {
 };
 
 function Dashboard() {
-  const status = useSuspenseQuery(deviceStatusQuery);
+  const status = useQuery(deviceStatusQuery);
   const history = useQuery(powerHistoryQuery("day"));
   const restart = useMutation({ mutationFn: restartDevice });
-  const data = status.data;
+
+  if (status.isLoading && !status.data) return <LoadingScreen />;
+  if (status.isError && !status.data) return <ErrorScreen error={status.error as Error} onRetry={() => status.refetch()} />;
+  const data = status.data!;
   const s = stateLabel[data.state];
-  const refreshingLive = status.isFetching && !status.isPending;
+  const refreshingLive = status.isFetching;
 
   return (
     <AppShell>
