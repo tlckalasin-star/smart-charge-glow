@@ -300,3 +300,37 @@ function MetricCard({
     </div>
   );
 }
+
+function LoadingScreen() {
+  return (
+    <AppShell>
+      <div className="grid min-h-[60vh] place-items-center px-5 text-sm text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          กำลังเชื่อมต่ออุปกรณ์...
+        </div>
+      </div>
+    </AppShell>
+  );
+}
+
+function ErrorScreen({ error, onRetry }: { error: Error; onRetry: () => void }) {
+  return (
+    <AppShell>
+      <div className="grid min-h-[60vh] place-items-center px-5">
+        <div className="max-w-sm rounded-3xl bg-surface p-6 text-center">
+          <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
+          <p className="mt-3 text-sm font-semibold">เชื่อมต่ออุปกรณ์ไม่สำเร็จ</p>
+          <p className="mt-1 text-xs text-muted-foreground break-words">{error?.message || "ไม่ทราบสาเหตุ"}</p>
+          <button
+            onClick={onRetry}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+          >
+            <RefreshCw className="h-3.5 w-3.5" />
+            ลองใหม่
+          </button>
+        </div>
+      </div>
+    </AppShell>
+  );
+}
