@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 import { AlertCircle, Loader2 } from "lucide-react";
@@ -15,7 +15,6 @@ export const Route = createFileRoute("/history")({
       { name: "description", content: "กราฟกำลังแบตเตอรี่ รายวัน รายสัปดาห์ และรายเดือน" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(deviceStatusQuery),
   component: HistoryPage,
 });
 
@@ -27,7 +26,7 @@ const ranges = [
 type RangeId = (typeof ranges)[number]["id"];
 
 function HistoryPage() {
-  const status = useSuspenseQuery(deviceStatusQuery);
+  const status = useQuery(deviceStatusQuery);
   const [range, setRange] = useState<RangeId>("day");
   const historyQ = useQuery(powerHistoryQuery(range));
 
@@ -132,7 +131,7 @@ function HistoryPage() {
             label="เฉลี่ย"
             value={series.length ? `${(series.reduce((a, b) => a + b.y, 0) / series.length).toFixed(1)} W` : "-"}
           />
-          <Stat label="อุณหภูมิ" value={`${status.data.temperature}°C`} />
+          <Stat label="อุณหภูมิ" value={status.data ? `${status.data.temperature}°C` : "-"} />
         </div>
       </div>
     </AppShell>

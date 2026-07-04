@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { Copy, Wifi, Check } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Copy, Wifi, Check, AlertCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
@@ -13,12 +13,40 @@ export const Route = createFileRoute("/device-info")({
       { name: "description", content: "รหัสอุปกรณ์ IP MAC โซนเวลา และความแรงสัญญาณ Wi-Fi" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(deviceInfoQuery),
   component: InfoPage,
 });
 
 function InfoPage() {
-  const { data } = useSuspenseQuery(deviceInfoQuery);
+  const { data, isLoading, isError, error, refetch } = useQuery(deviceInfoQuery);
+
+  if (isLoading || !data) {
+    return (
+      <AppShell>
+        <PageHeader title="ข้อมูลอุปกรณ์" />
+        <div className="grid min-h-[50vh] place-items-center px-5 text-sm text-muted-foreground">
+          {isError ? (
+            <div className="max-w-sm rounded-3xl bg-surface p-6 text-center">
+              <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
+              <p className="mt-3 text-sm font-semibold">โหลดข้อมูลไม่สำเร็จ</p>
+              <p className="mt-1 text-xs text-muted-foreground break-words">{(error as Error)?.message}</p>
+              <button
+                onClick={() => refetch()}
+                className="mt-4 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+              >
+                ลองใหม่
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              กำลังโหลด...
+            </div>
+          )}
+        </div>
+      </AppShell>
+    );
+  }
+
   const bars = rssiBars(data.rssi);
 
   return (
