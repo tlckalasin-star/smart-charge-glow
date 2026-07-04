@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery, useMutation } from "@tanstack/react-query";
-import { RefreshCw, Sun, BatteryCharging, Lightbulb, Thermometer, Zap, TrendingUp } from "lucide-react";
+import { useSuspenseQuery, useMutation, useQuery } from "@tanstack/react-query";
+import { RefreshCw, Sun, BatteryCharging, Lightbulb, Thermometer, Zap, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip } from "recharts";
 import { AppShell } from "@/components/app-shell";
-import { deviceStatusQuery, restartDevice } from "@/lib/tuya/client";
+import { deviceStatusQuery, powerHistoryQuery, restartDevice, REFRESH_MS } from "@/lib/tuya/client";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -25,9 +25,12 @@ const stateLabel: Record<string, { th: string; tone: string }> = {
 };
 
 function Dashboard() {
-  const { data } = useSuspenseQuery(deviceStatusQuery);
+  const status = useSuspenseQuery(deviceStatusQuery);
+  const history = useQuery(powerHistoryQuery("day"));
   const restart = useMutation({ mutationFn: restartDevice });
+  const data = status.data;
   const s = stateLabel[data.state];
+  const refreshingLive = status.isFetching && !status.isPending;
 
   return (
     <AppShell>
@@ -48,7 +51,7 @@ function Dashboard() {
           </button>
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
           <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium", s.tone)}>
             <span className="h-1.5 w-1.5 rounded-full bg-current" />
             {s.th}
@@ -57,6 +60,18 @@ function Dashboard() {
             <Thermometer className="h-3 w-3" />
             {data.temperature}°C
           </span>
+          {refreshingLive && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-surface px-3 py-1 text-xs text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              กำลังอัปเดต
+            </span>
+          )}
+          {status.isRefetchError && (
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/15 px-3 py-1 text-xs text-destructive">
+              <AlertCircle className="h-3 w-3" />
+              อัปเดตล้มเหลว
+            </span>
+          )}
         </div>
       </div>
 
@@ -131,42 +146,91 @@ function Dashboard() {
               <p className="text-sm font-semibold">วันนี้</p>
             </div>
             <span className="rounded-full bg-background/60 px-3 py-1 text-[10px] font-medium text-muted-foreground">
-              ทุก 1 ชั่วโมง
+              ทุก {REFRESH_MS / 1000} วิ
             </span>
           </div>
-          <div className="h-44 -mx-2">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data.history}>
-                <defs>
-                  <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="oklch(0.85 0.18 75)" stopOpacity={0.6} />
-                    <stop offset="100%" stopColor="oklch(0.78 0.16 70)" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="hour"
-                  tick={{ fill: "oklch(0.7 0.02 260)", fontSize: 10 }}
-                  axisLine={false}
-                  tickLine={false}
-                  ticks={[0, 6, 12, 18, 23]}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "oklch(0.22 0.03 260)",
-                    border: "1px solid oklch(1 0 0 / 0.1)",
-                    borderRadius: 12,
-                    fontSize: 12,
-                  }}
-                  labelFormatter={(h) => `${h}:00`}
-                  formatter={(v: unknown) => [`${v} W`, "กำลัง"] as [string, string]}
-                />
-                <Area type="monotone" dataKey="power" stroke="oklch(0.85 0.18 75)" strokeWidth={2} fill="url(#g1)" />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
+          <ChartArea query={history} />
         </div>
       </div>
     </AppShell>
+  );
+}
+
+function ChartArea({
+  query,
+}: {
+  query: ReturnType<typeof useQuery<Awaited<ReturnType<typeof import("@/lib/tuya/client").powerHistoryQuery> extends infer _ ? { t: number; power: number }[] : never>>>;
+}) {
+  const { data, isLoading, isError, error, refetch, isFetching } = query;
+
+  if (isLoading) {
+    return (
+      <div className="grid h-44 place-items-center text-xs text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          กำลังโหลดกราฟ...
+        </div>
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div className="flex h-44 flex-col items-center justify-center gap-2 text-center text-xs text-destructive">
+        <AlertCircle className="h-5 w-5" />
+        <p>{(error as Error).message || "โหลดกราฟล้มเหลว"}</p>
+        <button onClick={() => refetch()} className="mt-1 rounded-full bg-destructive/15 px-3 py-1 font-medium">
+          ลองใหม่
+        </button>
+      </div>
+    );
+  }
+  const series = (data ?? []).map((p) => ({
+    hour: new Date(p.t).getHours(),
+    power: Math.round(p.power),
+  }));
+  if (series.length === 0) {
+    return (
+      <div className="grid h-44 place-items-center text-xs text-muted-foreground">
+        ยังไม่มีข้อมูลใน 24 ชั่วโมงล่าสุด
+      </div>
+    );
+  }
+  return (
+    <div className="h-44 -mx-2 relative">
+      {isFetching && (
+        <span className="absolute right-2 top-1 z-10 inline-flex items-center gap-1 rounded-full bg-background/60 px-2 py-0.5 text-[10px] text-muted-foreground">
+          <Loader2 className="h-3 w-3 animate-spin" />
+          อัปเดต
+        </span>
+      )}
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={series}>
+          <defs>
+            <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="oklch(0.85 0.18 75)" stopOpacity={0.6} />
+              <stop offset="100%" stopColor="oklch(0.78 0.16 70)" stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis
+            dataKey="hour"
+            tick={{ fill: "oklch(0.7 0.02 260)", fontSize: 10 }}
+            axisLine={false}
+            tickLine={false}
+          />
+          <Tooltip
+            contentStyle={{
+              background: "oklch(0.22 0.03 260)",
+              border: "1px solid oklch(1 0 0 / 0.1)",
+              borderRadius: 12,
+              fontSize: 12,
+            }}
+            labelFormatter={(h) => `${h}:00`}
+            formatter={(v: unknown) => [`${v} W`, "กำลัง"] as [string, string]}
+          />
+          <Area type="monotone" dataKey="power" stroke="oklch(0.85 0.18 75)" strokeWidth={2} fill="url(#g1)" />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   );
 }
 
