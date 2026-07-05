@@ -39,8 +39,10 @@ function Dashboard() {
 
   return (
     <AppShell>
+      <AlertBanner status={data} />
       {/* Header */}
       <div className="px-5 pt-6">
+
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs uppercase tracking-widest text-muted-foreground">MPPT Controller</p>
