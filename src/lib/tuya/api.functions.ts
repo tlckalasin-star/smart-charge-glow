@@ -96,11 +96,20 @@ function mapSettings(codes: RawStatus): DeviceSettings {
   };
 }
 
-export const getRawStatusFn = createServerFn({ method: "GET" }).handler(async () => {
+export type RawCode = { code: string; value: string | number | boolean | null };
+export const getRawStatusFn = createServerFn({ method: "GET" }).handler(async (): Promise<RawCode[]> => {
   const { tuyaRequest, getDeviceId } = await import("./server");
   const id = getDeviceId();
   const codes = await tuyaRequest<RawStatus>(`/v1.0/iot-03/devices/${id}/status`);
-  return codes;
+  return codes.map((c) => ({
+    code: c.code,
+    value:
+      typeof c.value === "string" || typeof c.value === "number" || typeof c.value === "boolean"
+        ? c.value
+        : c.value === null
+          ? null
+          : JSON.stringify(c.value),
+  }));
 });
 
 type SpecFn = { code: string; name?: string; type?: string; values?: string };
