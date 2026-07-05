@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Battery, Zap, Lightbulb, Power, Clock, Check, AlertCircle, Loader2 } from "lucide-react";
+import { Battery, Zap, Lightbulb, Power, Clock, Check, AlertCircle, Loader2, Bell, Smartphone, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { Slider } from "@/components/ui/slider";
@@ -10,7 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { deviceSettingsQuery, saveDeviceSettings } from "@/lib/tuya/client";
 import type { DeviceSettings, BatteryType, LoadMode } from "@/lib/tuya/types";
+import { useAppSettings, type AlertRule } from "@/lib/app-settings";
+import { METRIC_LABEL } from "@/lib/alerts";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/settings")({
   head: () => ({
