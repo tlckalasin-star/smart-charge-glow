@@ -66,7 +66,9 @@ function InfoPage() {
               <p className="text-xs text-muted-foreground">Wi-Fi RSSI</p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-sm">{data.rssi} dBm</span>
+              <span className="font-mono text-sm">
+                {data.rssi <= -90 ? "ไม่มีสัญญาณ" : `${data.rssi} dBm`}
+              </span>
               <div className="flex items-end gap-0.5">
                 {[1, 2, 3, 4].map((i) => (
                   <span
@@ -133,6 +135,7 @@ function InfoRow({
 }
 
 function rssiBars(rssi: number) {
+  if (rssi <= -90) return 0;
   if (rssi >= -50) return 4;
   if (rssi >= -65) return 3;
   if (rssi >= -75) return 2;

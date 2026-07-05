@@ -33,11 +33,6 @@ function codeMatches(code: string, key: string) {
 }
 
 /** Normalize a Tuya DP value with heuristic scaling. */
-function n(codes: RawStatus, key: string, scale = 1, fallback = 0): number {
-  const item = pick(codes, [key]);
-  if (!item || typeof item.value !== "number") return fallback;
-  return item.value / scale;
-}
 function s<T extends string>(codes: RawStatus, key: string, fallback: T): T {
   const item = pick(codes, [key]);
   return (typeof item?.value === "string" ? (item.value as T) : fallback) as T;
@@ -214,7 +209,7 @@ export const getDeviceInfoFn = createServerFn({ method: "GET" }).handler(async (
     ip: info.ip || "-",
     mac: (f.mac || info.mac || "").toLowerCase(),
     timezone: info.time_zone || "Asia/Bangkok",
-    rssi: typeof f.rssi === "number" ? f.rssi : 0,
+    rssi: typeof f.rssi === "number" ? f.rssi : -100,
   };
   return result;
 });
@@ -225,6 +220,8 @@ export const saveDeviceSettingsFn = createServerFn({ method: "POST" })
     const { tuyaRequest, getDeviceId } = await import("./server");
     const id = getDeviceId();
     const commands: CodeValue[] = [
+      { code: "system_voltage", value: data.batVoltage },
+      { code: "battery_voltage_class", value: data.batVoltage },
       { code: "battery_type", value: data.batType },
       { code: "balance_voltage", value: Math.round(data.balanceVoltage * 10) },
       { code: "over_voltage", value: Math.round(data.overVoltage * 10) },
@@ -270,12 +267,13 @@ export const getPowerHistoryFn = createServerFn({ method: "GET" })
     const start = end - spanMs;
     type LogsResp = { logs?: { event_time: number; value: string; code?: string }[] };
     const codes = "battery_power,pv_power";
+    const size = data.range === "day" ? 100 : data.range === "week" ? 300 : 500;
     const res = await tuyaRequest<LogsResp>(
-      `/v1.0/devices/${id}/logs?start_time=${start}&end_time=${end}&type=7&codes=${codes}&size=100`,
+      `/v1.0/devices/${id}/logs?start_time=${start}&end_time=${end}&type=7&codes=${codes}&size=${size}`,
     ).catch(() => ({}) as LogsResp);
     const logs = res.logs || [];
     const battLogs = logs
-      .filter((l) => l.code === "battery_power" || !l.code)
+      .filter((l) => l.code === "battery_power")
       .map((l) => ({ t: l.event_time, v: Number(l.value) / 10 }))
       .filter((p) => Number.isFinite(p.v))
       .sort((a, b) => a.t - b.t);
