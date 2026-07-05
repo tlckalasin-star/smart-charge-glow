@@ -4,24 +4,51 @@ import type { DeviceStatus, DeviceSettings, DeviceInfo, BatteryType, LoadMode } 
 type CodeValue = { code: string; value: unknown };
 type RawStatus = CodeValue[];
 
+/**
+ * Tokenize a DP code or alias into lower-case tokens for fuzzy matching.
+ */
+function tokensOf(s: string) {
+  return s
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+}
+
+function codeMatches(code: string, key: string) {
+  if (code === key) return true;
+  if (code.toLowerCase() === key.toLowerCase()) return true;
+  const codeTokens = tokensOf(code);
+  const keyTokens = tokensOf(key);
+  // require every token in the candidate key to appear in the actual code
+  return keyTokens.every((t) => codeTokens.includes(t));
+}
+
 /** Normalize a Tuya DP value with heuristic scaling. */
 function n(codes: RawStatus, key: string, scale = 1, fallback = 0): number {
-  const item = codes.find((c) => c.code === key);
+  const item = pick(codes, [key]);
   if (!item || typeof item.value !== "number") return fallback;
   return item.value / scale;
 }
 function s<T extends string>(codes: RawStatus, key: string, fallback: T): T {
-  const item = codes.find((c) => c.code === key);
+  const item = pick(codes, [key]);
   return (typeof item?.value === "string" ? (item.value as T) : fallback) as T;
 }
 function b(codes: RawStatus, key: string, fallback = false): boolean {
-  const item = codes.find((c) => c.code === key);
+  const item = pick(codes, [key]);
   return typeof item?.value === "boolean" ? item.value : fallback;
 }
 
 function pick(codes: RawStatus, keys: string[]): CodeValue | undefined {
+  // Try exact matches first, then case-insensitive, then token-based fuzzy match.
   for (const k of keys) {
-    const found = codes.find((c) => c.code === k);
+    // exact
+    let found = codes.find((c) => c.code === k);
+    if (found) return found;
+    // case-insensitive
+    found = codes.find((c) => c.code.toLowerCase() === k.toLowerCase());
+    if (found) return found;
+    // token-based fuzzy match (all tokens in key must appear in code)
+    found = codes.find((c) => codeMatches(c.code, k));
     if (found) return found;
   }
   return undefined;
