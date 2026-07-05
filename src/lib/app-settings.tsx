@@ -19,9 +19,30 @@ export type AppSettings = {
 const STORAGE_KEY = "smart-charge-glow:app-settings-v1";
 
 const DEFAULT_RULES: AlertRule[] = [
-  { id: "batt-low", label: "แบตต่ำ", metric: "battery.percent", op: "lt", threshold: 20, enabled: true },
-  { id: "batt-under-v", label: "แรงดันแบตต่ำ", metric: "battery.voltage", op: "lt", threshold: 22, enabled: true },
-  { id: "temp-high", label: "อุณหภูมิสูง", metric: "temperature", op: "gt", threshold: 65, enabled: true },
+  {
+    id: "batt-low",
+    label: "แบตต่ำ",
+    metric: "battery.percent",
+    op: "lt",
+    threshold: 20,
+    enabled: true,
+  },
+  {
+    id: "batt-under-v",
+    label: "แรงดันแบตต่ำ",
+    metric: "battery.voltage",
+    op: "lt",
+    threshold: 22,
+    enabled: true,
+  },
+  {
+    id: "temp-high",
+    label: "อุณหภูมิสูง",
+    metric: "temperature",
+    op: "gt",
+    threshold: 65,
+    enabled: true,
+  },
 ];
 
 const DEFAULTS: AppSettings = {
@@ -50,8 +71,12 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       const parsed = JSON.parse(raw) as Partial<AppSettings>;
       setSettings((prev) => ({
         refreshMs: typeof parsed.refreshMs === "number" ? parsed.refreshMs : prev.refreshMs,
-        reduceMotion: typeof parsed.reduceMotion === "boolean" ? parsed.reduceMotion : prev.reduceMotion,
-        alertRules: Array.isArray(parsed.alertRules) && parsed.alertRules.length ? parsed.alertRules : prev.alertRules,
+        reduceMotion:
+          typeof parsed.reduceMotion === "boolean" ? parsed.reduceMotion : prev.reduceMotion,
+        alertRules:
+          Array.isArray(parsed.alertRules) && parsed.alertRules.length
+            ? parsed.alertRules
+            : prev.alertRules,
       }));
     } catch {
       /* ignore */
@@ -70,7 +95,8 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
   const value = useMemo<Ctx>(
     () => ({
       ...settings,
-      setRefreshMs: (v) => setSettings((s) => ({ ...s, refreshMs: Math.max(5_000, Math.min(300_000, v)) })),
+      setRefreshMs: (v) =>
+        setSettings((s) => ({ ...s, refreshMs: Math.max(5_000, Math.min(300_000, v)) })),
       setReduceMotion: (v) => setSettings((s) => ({ ...s, reduceMotion: v })),
       setAlertRules: (rules) => setSettings((s) => ({ ...s, alertRules: rules })),
       updateRule: (id, patch) =>

@@ -68,7 +68,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0a0e1a" },
       { title: "MPPT HM-6096 — ตัวควบคุมการชาร์จโซลาร์" },
-      { name: "description", content: "แอปควบคุมและติดตามค่า MPPT Solar Charge Controller HM-6096 แบบเรียลไทม์" },
+      {
+        name: "description",
+        content: "แอปควบคุมและติดตามค่า MPPT Solar Charge Controller HM-6096 แบบเรียลไทม์",
+      },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),

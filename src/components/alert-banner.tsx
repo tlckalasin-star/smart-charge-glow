@@ -14,7 +14,8 @@ export function AlertBanner({ status }: { status: DeviceStatus | undefined }) {
   useEffect(() => {
     setDismissed((prev) => {
       const next = new Set<string>();
-      for (const a of active) if (prev.has(a.id + ":" + a.value.toFixed(1))) next.add(a.id + ":" + a.value.toFixed(1));
+      for (const a of active)
+        if (prev.has(a.id + ":" + a.value.toFixed(1))) next.add(a.id + ":" + a.value.toFixed(1));
       return next;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -34,8 +35,9 @@ export function AlertBanner({ status }: { status: DeviceStatus | undefined }) {
           <div className="min-w-0 flex-1 text-xs leading-relaxed">
             <p className="font-semibold">{a.label}</p>
             <p className="text-destructive/80">
-              ค่า <span className="font-mono">{a.value.toFixed(1)}</span> {a.op === "lt" ? "ต่ำกว่า" : "สูงกว่า"}{" "}
-              เกณฑ์ <span className="font-mono">{a.threshold}</span>
+              ค่า <span className="font-mono">{a.value.toFixed(1)}</span>{" "}
+              {a.op === "lt" ? "ต่ำกว่า" : "สูงกว่า"} เกณฑ์{" "}
+              <span className="font-mono">{a.threshold}</span>
             </p>
           </div>
           <button

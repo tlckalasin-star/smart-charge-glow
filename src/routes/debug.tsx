@@ -74,7 +74,9 @@ function DebugPage() {
           <div className="rounded-3xl bg-surface p-6 text-center">
             <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
             <p className="mt-3 text-sm font-semibold">โหลดไม่สำเร็จ</p>
-            <p className="mt-1 break-words text-xs text-muted-foreground">{(raw.error as Error).message}</p>
+            <p className="mt-1 break-words text-xs text-muted-foreground">
+              {(raw.error as Error).message}
+            </p>
             <button
               onClick={() => raw.refetch()}
               className="mt-4 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
@@ -96,7 +98,9 @@ function DebugPage() {
                   >
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-mono text-xs">{r.code}</p>
-                      {r.name && <p className="truncate text-[11px] text-muted-foreground">{r.name}</p>}
+                      {r.name && (
+                        <p className="truncate text-[11px] text-muted-foreground">{r.name}</p>
+                      )}
                     </div>
                     <div className="shrink-0 text-right">
                       <p className="font-mono text-xs text-primary">{formatVal(r.value)}</p>
@@ -117,7 +121,8 @@ function groupOf(code: string): "PV" | "Battery" | "Load" | "System" {
   const c = code.toLowerCase();
   if (c.includes("pv") || c.includes("solar")) return "PV";
   if (c.includes("bat") || c.includes("soc") || c.includes("charge")) return "Battery";
-  if (c.includes("load") || c.includes("switch") || c.includes("rtc") || c.includes("power_set")) return "Load";
+  if (c.includes("load") || c.includes("switch") || c.includes("rtc") || c.includes("power_set"))
+    return "Load";
   return "System";
 }
 

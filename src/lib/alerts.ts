@@ -25,7 +25,10 @@ function readMetric(status: DeviceStatus, metric: AlertRule["metric"]): number {
   }
 }
 
-export function evaluateAlerts(status: DeviceStatus | undefined, rules: AlertRule[]): ActiveAlert[] {
+export function evaluateAlerts(
+  status: DeviceStatus | undefined,
+  rules: AlertRule[],
+): ActiveAlert[] {
   if (!status) return [];
   const out: ActiveAlert[] = [];
   for (const r of rules) {
@@ -33,7 +36,14 @@ export function evaluateAlerts(status: DeviceStatus | undefined, rules: AlertRul
     const v = readMetric(status, r.metric);
     const triggered = r.op === "lt" ? v < r.threshold : v > r.threshold;
     if (triggered) {
-      out.push({ id: r.id, label: r.label, metric: r.metric, value: v, threshold: r.threshold, op: r.op });
+      out.push({
+        id: r.id,
+        label: r.label,
+        metric: r.metric,
+        value: v,
+        threshold: r.threshold,
+        op: r.op,
+      });
     }
   }
   return out;

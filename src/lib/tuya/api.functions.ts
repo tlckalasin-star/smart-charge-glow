@@ -1,11 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import type {
-  DeviceStatus,
-  DeviceSettings,
-  DeviceInfo,
-  BatteryType,
-  LoadMode,
-} from "./types";
+import type { DeviceStatus, DeviceSettings, DeviceInfo, BatteryType, LoadMode } from "./types";
 
 type CodeValue = { code: string; value: unknown };
 type RawStatus = CodeValue[];
@@ -42,11 +36,13 @@ function mapStatus(codes: RawStatus, model: string, mac: string): DeviceStatus {
   // DP code names vary between MPPT firmware revisions.
   // We try common aliases used by Tuya solar-charge-controller schemas.
   const stateRaw = String(pick(codes, ["work_state", "device_state", "charge_state"])?.value ?? "");
-  const state: DeviceStatus["state"] =
-    /fault|error/i.test(stateRaw) ? "fault"
-    : /discharg/i.test(stateRaw) ? "discharging"
-    : /charg/i.test(stateRaw) ? "charging"
-    : "standby";
+  const state: DeviceStatus["state"] = /fault|error/i.test(stateRaw)
+    ? "fault"
+    : /discharg/i.test(stateRaw)
+      ? "discharging"
+      : /charg/i.test(stateRaw)
+        ? "charging"
+        : "standby";
 
   return {
     state,
@@ -62,7 +58,10 @@ function mapStatus(codes: RawStatus, model: string, mac: string): DeviceStatus {
       voltage: pickNum(codes, ["battery_voltage", "bat_voltage"], 10),
       current: pickNum(codes, ["battery_current", "bat_current"], 100),
       power: pickNum(codes, ["battery_power", "bat_power"], 10),
-      percent: Math.max(0, Math.min(100, pickNum(codes, ["battery_percentage", "bat_percentage", "soc"], 1, 0))),
+      percent: Math.max(
+        0,
+        Math.min(100, pickNum(codes, ["battery_percentage", "bat_percentage", "soc"], 1, 0)),
+      ),
     },
     load: {
       voltage: pickNum(codes, ["load_voltage"], 10),
@@ -97,20 +96,22 @@ function mapSettings(codes: RawStatus): DeviceSettings {
 }
 
 export type RawCode = { code: string; value: string | number | boolean | null };
-export const getRawStatusFn = createServerFn({ method: "GET" }).handler(async (): Promise<RawCode[]> => {
-  const { tuyaRequest, getDeviceId } = await import("./server");
-  const id = getDeviceId();
-  const codes = await tuyaRequest<RawStatus>(`/v1.0/iot-03/devices/${id}/status`);
-  return codes.map((c) => ({
-    code: c.code,
-    value:
-      typeof c.value === "string" || typeof c.value === "number" || typeof c.value === "boolean"
-        ? c.value
-        : c.value === null
-          ? null
-          : JSON.stringify(c.value),
-  }));
-});
+export const getRawStatusFn = createServerFn({ method: "GET" }).handler(
+  async (): Promise<RawCode[]> => {
+    const { tuyaRequest, getDeviceId } = await import("./server");
+    const id = getDeviceId();
+    const codes = await tuyaRequest<RawStatus>(`/v1.0/iot-03/devices/${id}/status`);
+    return codes.map((c) => ({
+      code: c.code,
+      value:
+        typeof c.value === "string" || typeof c.value === "number" || typeof c.value === "boolean"
+          ? c.value
+          : c.value === null
+            ? null
+            : JSON.stringify(c.value),
+    }));
+  },
+);
 
 type SpecFn = { code: string; name?: string; type?: string; values?: string };
 export const getSpecificationsFn = createServerFn({ method: "GET" }).handler(async () => {
@@ -129,7 +130,7 @@ export const getDeviceStatusFn = createServerFn({ method: "GET" }).handler(async
     tuyaRequest<RawStatus>(`/v1.0/iot-03/devices/${id}/status`),
     tuyaRequest<{ name?: string; product_name?: string; mac?: string; category?: string }>(
       `/v1.0/devices/${id}`,
-    ).catch(() => ({} as { name?: string; product_name?: string; mac?: string })),
+    ).catch(() => ({}) as { name?: string; product_name?: string; mac?: string }),
   ]);
   const model = info.product_name || info.name || "HM-6096";
   const mac = (info.mac || "").toUpperCase();
@@ -156,7 +157,9 @@ export const getDeviceInfoFn = createServerFn({ method: "GET" }).handler(async (
   type FactoryResp = { rssi?: number; mac?: string; uuid?: string };
   const [info, factory] = await Promise.all([
     tuyaRequest<InfoResp>(`/v1.0/devices/${id}`),
-    tuyaRequest<FactoryResp[]>(`/v1.0/devices/factory-infos?device_ids=${id}`).catch(() => [] as FactoryResp[]),
+    tuyaRequest<FactoryResp[]>(`/v1.0/devices/factory-infos?device_ids=${id}`).catch(
+      () => [] as FactoryResp[],
+    ),
   ]);
   const f = factory[0] || {};
   const result: DeviceInfo = {
@@ -212,13 +215,17 @@ export const getPowerHistoryFn = createServerFn({ method: "GET" })
     const id = getDeviceId();
     const end = Date.now();
     const spanMs =
-      data.range === "day" ? 24 * 3600_000 : data.range === "week" ? 7 * 24 * 3600_000 : 30 * 24 * 3600_000;
+      data.range === "day"
+        ? 24 * 3600_000
+        : data.range === "week"
+          ? 7 * 24 * 3600_000
+          : 30 * 24 * 3600_000;
     const start = end - spanMs;
     type LogsResp = { logs?: { event_time: number; value: string; code?: string }[] };
     const codes = "battery_power,pv_power";
     const res = await tuyaRequest<LogsResp>(
       `/v1.0/devices/${id}/logs?start_time=${start}&end_time=${end}&type=7&codes=${codes}&size=100`,
-    ).catch(() => ({} as LogsResp));
+    ).catch(() => ({}) as LogsResp);
     const logs = res.logs || [];
     const battLogs = logs
       .filter((l) => l.code === "battery_power" || !l.code)

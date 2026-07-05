@@ -1,12 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Battery, Zap, Lightbulb, Power, Clock, Check, AlertCircle, Loader2, Bell, Smartphone, Trash2 } from "lucide-react";
+import {
+  Battery,
+  Zap,
+  Lightbulb,
+  Power,
+  Clock,
+  Check,
+  AlertCircle,
+  Loader2,
+  Bell,
+  Smartphone,
+  Trash2,
+} from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { deviceSettingsQuery, saveDeviceSettings } from "@/lib/tuya/client";
 import type { DeviceSettings, BatteryType, LoadMode } from "@/lib/tuya/types";
@@ -83,7 +101,9 @@ function DeviceTab() {
           <div className="max-w-sm rounded-3xl bg-surface p-6 text-center">
             <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
             <p className="mt-3 text-sm font-semibold">โหลดค่าจากอุปกรณ์ไม่สำเร็จ</p>
-            <p className="mt-1 text-xs text-muted-foreground break-words">{(q.error as Error)?.message}</p>
+            <p className="mt-1 text-xs text-muted-foreground break-words">
+              {(q.error as Error)?.message}
+            </p>
             <button
               onClick={() => q.refetch()}
               className="mt-4 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
@@ -108,8 +128,13 @@ function DeviceTab() {
     <div className="space-y-5 px-5 pt-4">
       <Section icon={<Battery className="h-4 w-4" />} title="แบตเตอรี่">
         <Row label="แรงดันระบบ" hint="BAT voltage">
-          <Select value={String(s.batVoltage)} onValueChange={(v) => update("batVoltage", Number(v) as 12 | 24 | 48)}>
-            <SelectTrigger className="h-9 w-28 bg-background"><SelectValue /></SelectTrigger>
+          <Select
+            value={String(s.batVoltage)}
+            onValueChange={(v) => update("batVoltage", Number(v) as 12 | 24 | 48)}
+          >
+            <SelectTrigger className="h-9 w-28 bg-background">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="12">12 V</SelectItem>
               <SelectItem value="24">24 V</SelectItem>
@@ -119,7 +144,9 @@ function DeviceTab() {
         </Row>
         <Row label="ชนิดแบตเตอรี่" hint="BAT type">
           <Select value={s.batType} onValueChange={(v) => update("batType", v as BatteryType)}>
-            <SelectTrigger className="h-9 w-32 bg-background"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-9 w-32 bg-background">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="Seal">Seal</SelectItem>
               <SelectItem value="Gel">Gel</SelectItem>
@@ -128,19 +155,53 @@ function DeviceTab() {
             </SelectContent>
           </Select>
         </Row>
-        <VoltageRow label="แรงดันบาลานซ์" hint="Balance voltage" value={s.balanceVoltage} min={20} max={32} step={0.1} onChange={(v) => update("balanceVoltage", v)} />
+        <VoltageRow
+          label="แรงดันบาลานซ์"
+          hint="Balance voltage"
+          value={s.balanceVoltage}
+          min={20}
+          max={32}
+          step={0.1}
+          onChange={(v) => update("balanceVoltage", v)}
+        />
       </Section>
 
       <Section icon={<Zap className="h-4 w-4" />} title="แรงดัน">
-        <VoltageRow label="แรงดันเกิน" hint="Over-vol" value={s.overVoltage} min={20} max={32} step={0.1} onChange={(v) => update("overVoltage", v)} />
-        <VoltageRow label="แรงดันคืนสภาพ" hint="Recovery" value={s.recoveryVoltage} min={18} max={28} step={0.1} onChange={(v) => update("recoveryVoltage", v)} />
-        <VoltageRow label="แรงดันต่ำ" hint="Under-vol" value={s.underVoltage} min={16} max={26} step={0.1} onChange={(v) => update("underVoltage", v)} />
+        <VoltageRow
+          label="แรงดันเกิน"
+          hint="Over-vol"
+          value={s.overVoltage}
+          min={20}
+          max={32}
+          step={0.1}
+          onChange={(v) => update("overVoltage", v)}
+        />
+        <VoltageRow
+          label="แรงดันคืนสภาพ"
+          hint="Recovery"
+          value={s.recoveryVoltage}
+          min={18}
+          max={28}
+          step={0.1}
+          onChange={(v) => update("recoveryVoltage", v)}
+        />
+        <VoltageRow
+          label="แรงดันต่ำ"
+          hint="Under-vol"
+          value={s.underVoltage}
+          min={16}
+          max={26}
+          step={0.1}
+          onChange={(v) => update("underVoltage", v)}
+        />
       </Section>
 
       <Section icon={<Lightbulb className="h-4 w-4" />} title="โหลด">
         <Row label="โหมดโหลด" hint="Load mode">
           <Select value={s.loadMode} onValueChange={(v) => update("loadMode", v as LoadMode)}>
-            <SelectTrigger className="h-9 w-32 bg-background"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-9 w-32 bg-background">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="24H">24 ชม.</SelectItem>
               <SelectItem value="Light">ตามแสง</SelectItem>
@@ -157,13 +218,29 @@ function DeviceTab() {
             </div>
             <span className="font-mono text-sm font-semibold text-primary">{s.powerSet}%</span>
           </div>
-          <Slider value={[s.powerSet]} min={0} max={100} step={5} onValueChange={([v]) => update("powerSet", v)} />
+          <Slider
+            value={[s.powerSet]}
+            min={0}
+            max={100}
+            step={5}
+            onValueChange={([v]) => update("powerSet", v)}
+          />
         </div>
         <Row label="ช่วงเวลา RTC" hint="RTC timer">
           <div className="flex items-center gap-1 font-mono text-sm">
-            <Input type="time" value={s.rtcStart} onChange={(e) => update("rtcStart", e.target.value)} className="h-9 w-24 bg-background" />
+            <Input
+              type="time"
+              value={s.rtcStart}
+              onChange={(e) => update("rtcStart", e.target.value)}
+              className="h-9 w-24 bg-background"
+            />
             <span className="text-muted-foreground">–</span>
-            <Input type="time" value={s.rtcEnd} onChange={(e) => update("rtcEnd", e.target.value)} className="h-9 w-24 bg-background" />
+            <Input
+              type="time"
+              value={s.rtcEnd}
+              onChange={(e) => update("rtcEnd", e.target.value)}
+              className="h-9 w-24 bg-background"
+            />
           </div>
         </Row>
       </Section>
@@ -201,8 +278,15 @@ function DeviceTab() {
 }
 
 function AppTab() {
-  const { refreshMs, setRefreshMs, reduceMotion, setReduceMotion, alertRules, setAlertRules, updateRule } =
-    useAppSettings();
+  const {
+    refreshMs,
+    setRefreshMs,
+    reduceMotion,
+    setReduceMotion,
+    alertRules,
+    setAlertRules,
+    updateRule,
+  } = useAppSettings();
   const seconds = Math.round(refreshMs / 1000);
 
   const addRule = () => {
@@ -252,7 +336,10 @@ function AppTab() {
                   onChange={(e) => updateRule(r.id, { label: e.target.value })}
                   className="h-8 flex-1 bg-background text-sm"
                 />
-                <Switch checked={r.enabled} onCheckedChange={(v) => updateRule(r.id, { enabled: v })} />
+                <Switch
+                  checked={r.enabled}
+                  onCheckedChange={(v) => updateRule(r.id, { enabled: v })}
+                />
                 <button
                   onClick={() => removeRule(r.id)}
                   className="rounded-full p-1.5 text-muted-foreground hover:bg-destructive/15 hover:text-destructive"
@@ -266,7 +353,9 @@ function AppTab() {
                   value={r.metric}
                   onValueChange={(v) => updateRule(r.id, { metric: v as AlertRule["metric"] })}
                 >
-                  <SelectTrigger className="h-8 bg-background text-xs"><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-8 bg-background text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {(Object.keys(METRIC_LABEL) as AlertRule["metric"][]).map((m) => (
                       <SelectItem key={m} value={m}>
@@ -275,8 +364,13 @@ function AppTab() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Select value={r.op} onValueChange={(v) => updateRule(r.id, { op: v as AlertRule["op"] })}>
-                  <SelectTrigger className="h-8 w-20 bg-background text-xs"><SelectValue /></SelectTrigger>
+                <Select
+                  value={r.op}
+                  onValueChange={(v) => updateRule(r.id, { op: v as AlertRule["op"] })}
+                >
+                  <SelectTrigger className="h-8 w-20 bg-background text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="lt">น้อยกว่า</SelectItem>
                     <SelectItem value="gt">มากกว่า</SelectItem>
@@ -303,11 +397,21 @@ function AppTab() {
   );
 }
 
-function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+function Section({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <section className="rounded-3xl bg-surface p-4">
       <header className="mb-2 flex items-center gap-2 px-1 pb-2">
-        <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/15 text-primary">{icon}</span>
+        <span className="grid h-7 w-7 place-items-center rounded-lg bg-primary/15 text-primary">
+          {icon}
+        </span>
         <h2 className="text-sm font-semibold">{title}</h2>
       </header>
       <div className="divide-y divide-border">{children}</div>
@@ -315,7 +419,15 @@ function Section({ icon, title, children }: { icon: React.ReactNode; title: stri
   );
 }
 
-function Row({ label, hint, children }: { label: string; hint: string; children: React.ReactNode }) {
+function Row({
+  label,
+  hint,
+  children,
+}: {
+  label: string;
+  hint: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="flex items-center justify-between gap-3 py-3">
       <div className="min-w-0">
@@ -328,8 +440,22 @@ function Row({ label, hint, children }: { label: string; hint: string; children:
 }
 
 function VoltageRow({
-  label, hint, value, min, max, step, onChange,
-}: { label: string; hint: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
+  label,
+  hint,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  onChange: (v: number) => void;
+}) {
   return (
     <div className="space-y-2 py-3">
       <div className="flex items-center justify-between">
@@ -350,7 +476,13 @@ function VoltageRow({
           <span className="text-xs text-muted-foreground">V</span>
         </div>
       </div>
-      <Slider value={[value]} min={min} max={max} step={step} onValueChange={([v]) => onChange(v)} />
+      <Slider
+        value={[value]}
+        min={min}
+        max={max}
+        step={step}
+        onValueChange={([v]) => onChange(v)}
+      />
     </div>
   );
 }
