@@ -3,7 +3,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { RefreshCw, Sun, BatteryCharging, Lightbulb, Thermometer, Zap, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip } from "recharts";
 import { AppShell } from "@/components/app-shell";
-import { deviceStatusQuery, powerHistoryQuery, restartDevice, REFRESH_MS } from "@/lib/tuya/client";
+import { AlertBanner } from "@/components/alert-banner";
+import { deviceStatusQuery, powerHistoryQuery, restartDevice } from "@/lib/tuya/client";
+import { useAppSettings } from "@/lib/app-settings";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -24,8 +26,9 @@ const stateLabel: Record<string, { th: string; tone: string }> = {
 };
 
 function Dashboard() {
-  const status = useQuery(deviceStatusQuery);
-  const history = useQuery(powerHistoryQuery("day"));
+  const { refreshMs } = useAppSettings();
+  const status = useQuery({ ...deviceStatusQuery, refetchInterval: refreshMs });
+  const history = useQuery({ ...powerHistoryQuery("day"), refetchInterval: refreshMs * 2 });
   const restart = useMutation({ mutationFn: restartDevice });
 
   if (status.isLoading && !status.data) return <LoadingScreen />;
