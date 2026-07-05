@@ -46,10 +46,11 @@ function buildSign(
   urlPath: string,
   body: string,
   t: string,
+  nonce = "",
 ) {
   const contentHash = sha256Hex(body);
   const stringToSign = `${method}\n${contentHash}\n\n${urlPath}`;
-  const signStr = `${accessId}${accessToken}${t}${stringToSign}`;
+  const signStr = `${accessId}${accessToken}${t}${nonce}${stringToSign}`;
   return hmacHex(signStr, accessSecret);
 }
 

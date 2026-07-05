@@ -126,7 +126,6 @@ function mapSettings(codes: RawStatus): DeviceSettings {
  */
 function settingsToCommands(s: DeviceSettings): CodeValue[] {
   return [
-    { code: "system_voltage", value: s.batVoltage },
     { code: "battery_voltage_class", value: s.batVoltage },
     { code: "battery_type", value: s.batType },
     { code: "balance_voltage", value: Math.round(s.balanceVoltage * 10) },
