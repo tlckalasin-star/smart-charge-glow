@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Battery,
   Zap,
@@ -81,8 +81,12 @@ function DeviceTab() {
   const q = useQuery(deviceSettingsQuery);
   const qc = useQueryClient();
   const [s, setS] = useState<DeviceSettings | null>(q.data ?? null);
+  const hasHydrated = useRef(false);
   useEffect(() => {
-    if (q.data) setS(q.data);
+    if (q.data && !hasHydrated.current) {
+      setS(q.data);
+      hasHydrated.current = true;
+    }
   }, [q.data]);
 
   const save = useMutation({
@@ -121,8 +125,8 @@ function DeviceTab() {
     );
   }
 
-  const update = <K extends keyof DeviceSettings>(k: K, v: DeviceSettings[K]) =>
-    setS((p) => (p ? { ...p, [k]: v } : p));
+  const update = useCallback(<K extends keyof DeviceSettings>(k: K, v: DeviceSettings[K]) =>
+    setS((p) => (p ? { ...p, [k]: v } : p)), []);
 
   return (
     <div className="space-y-5 px-5 pt-4">
@@ -257,7 +261,10 @@ function DeviceTab() {
       <div className="sticky bottom-20 -mx-5 border-t border-border bg-background/95 px-5 py-3 backdrop-blur">
         <div className="flex gap-2">
           <button
-            onClick={() => qc.invalidateQueries({ queryKey: ["tuya", "settings"] })}
+            onClick={() => {
+              hasHydrated.current = false;
+              qc.invalidateQueries({ queryKey: ["tuya", "settings"] });
+            }}
             className="flex-1 rounded-full bg-surface py-3 text-sm font-medium"
           >
             <Clock className="mr-1.5 inline h-4 w-4" />

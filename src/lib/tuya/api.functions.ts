@@ -21,11 +21,6 @@ function codeMatches(code: string, key: string) {
   const codeTokens = tokensOf(code);
   const keyTokens = tokensOf(key);
 
-  // Require the SAME set of tokens (order-independent), not just "every key
-  // token appears somewhere in code". A subset check lets a short alias like
-  // "battery_voltage" ([battery, voltage]) wrongly match a longer, semantically
-  // different dp code like "battery_voltage_class" ([battery, voltage, class])
-  // — those are different settings entirely, not aliases of each other.
   if (codeTokens.length !== keyTokens.length) return false;
 
   const codeSet = new Set(codeTokens);
@@ -42,16 +37,6 @@ function b(codes: RawStatus, key: string, fallback = false): boolean {
   return typeof item?.value === "boolean" ? item.value : fallback;
 }
 
-/**
- * Finds a dp code entry matching one of the candidate `keys`, trying:
- *   1. exact match
- *   2. case-insensitive match
- *   3. token-set fuzzy match (same tokens, different order/case/separators)
- *
- * Each tier is tried across ALL candidate keys before falling through to the
- * next tier, so an exact match on a later alias always wins over a fuzzy
- * match on an earlier one.
- */
 function pick(codes: RawStatus, keys: string[]): CodeValue | undefined {
   for (const k of keys) {
     const found = codes.find((c) => c.code === k);
@@ -75,8 +60,6 @@ function pickNum(codes: RawStatus, keys: string[], scale = 1, fallback = 0): num
 }
 
 function mapStatus(codes: RawStatus, model: string, mac: string): DeviceStatus {
-  // DP code names vary between MPPT firmware revisions.
-  // We try common aliases used by Tuya solar-charge-controller schemas.
   const stateRaw = String(pick(codes, ["work_state", "device_state", "charge_state"])?.value ?? "");
   const state: DeviceStatus["state"] = /fault|error/i.test(stateRaw)
     ? "fault"
@@ -135,6 +118,47 @@ function mapSettings(codes: RawStatus): DeviceSettings {
     rtcStart: s(codes, "rtc_start", "18:30"),
     rtcEnd: s(codes, "rtc_end", "06:30"),
   };
+}
+
+/**
+ * Build the full set of commands from a DeviceSettings object.
+ * This is the canonical mapping so we diff against it when saving.
+ */
+function settingsToCommands(s: DeviceSettings): CodeValue[] {
+  return [
+    { code: "system_voltage", value: s.batVoltage },
+    { code: "battery_voltage_class", value: s.batVoltage },
+    { code: "battery_type", value: s.batType },
+    { code: "balance_voltage", value: Math.round(s.balanceVoltage * 10) },
+    { code: "over_voltage", value: Math.round(s.overVoltage * 10) },
+    { code: "recovery_voltage", value: Math.round(s.recoveryVoltage * 10) },
+    { code: "under_voltage", value: Math.round(s.underVoltage * 10) },
+    { code: "load_mode", value: s.loadMode },
+    { code: "power_set", value: s.powerSet },
+    { code: "switch", value: s.switchOn },
+    { code: "switch_led", value: s.switchLed },
+    { code: "rtc_start", value: s.rtcStart },
+    { code: "rtc_end", value: s.rtcEnd },
+  ];
+}
+
+/** Read a known raw-status code's value via pick, returning the raw (possibly scaled-back) number. */
+function currentScaled(codes: RawStatus, keys: string[], scale: number): number | undefined {
+  const item = pick(codes, keys);
+  if (!item || typeof item.value !== "number") return undefined;
+  return item.value / scale;
+}
+function currentRaw(codes: RawStatus, keys: string[]): unknown {
+  const item = pick(codes, keys);
+  return item?.value;
+}
+function currentRawStr(codes: RawStatus, keys: string[]): string | undefined {
+  const item = pick(codes, keys);
+  return typeof item?.value === "string" ? item.value : undefined;
+}
+function currentRawBool(codes: RawStatus, keys: string[]): boolean | undefined {
+  const item = pick(codes, keys);
+  return typeof item?.value === "boolean" ? item.value : undefined;
 }
 
 export type RawCode = { code: string; value: string | number | boolean | null };
@@ -214,31 +238,47 @@ export const getDeviceInfoFn = createServerFn({ method: "GET" }).handler(async (
   return result;
 });
 
+/**
+ * Save device settings — only sends commands whose values differ from current device state.
+ * This avoids unnecessary writes and reduces the chance of device rejection.
+ */
 export const saveDeviceSettingsFn = createServerFn({ method: "POST" })
-  .validator((input: DeviceSettings) => input)
+  .validator((input: DeviceSettings): DeviceSettings => {
+    // Basic sanity: clamp / validate before sending to device
+    const clamped = { ...input };
+    if (![12, 24, 48].includes(clamped.batVoltage)) clamped.batVoltage = 24;
+    clamped.balanceVoltage = Math.round(Math.max(20, Math.min(32, clamped.balanceVoltage)) * 10) / 10;
+    clamped.overVoltage = Math.round(Math.max(20, Math.min(32, clamped.overVoltage)) * 10) / 10;
+    clamped.recoveryVoltage = Math.round(Math.max(18, Math.min(28, clamped.recoveryVoltage)) * 10) / 10;
+    clamped.underVoltage = Math.round(Math.max(16, Math.min(26, clamped.underVoltage)) * 10) / 10;
+    return clamped;
+  })
   .handler(async ({ data }) => {
     const { tuyaRequest, getDeviceId } = await import("./server");
     const id = getDeviceId();
-    const commands: CodeValue[] = [
-      { code: "system_voltage", value: data.batVoltage },
-      { code: "battery_voltage_class", value: data.batVoltage },
-      { code: "battery_type", value: data.batType },
-      { code: "balance_voltage", value: Math.round(data.balanceVoltage * 10) },
-      { code: "over_voltage", value: Math.round(data.overVoltage * 10) },
-      { code: "recovery_voltage", value: Math.round(data.recoveryVoltage * 10) },
-      { code: "under_voltage", value: Math.round(data.underVoltage * 10) },
-      { code: "load_mode", value: data.loadMode },
-      { code: "power_set", value: data.powerSet },
-      { code: "switch", value: data.switchOn },
-      { code: "switch_led", value: data.switchLed },
-      { code: "rtc_start", value: data.rtcStart },
-      { code: "rtc_end", value: data.rtcEnd },
-    ];
+
+    // Fetch current raw status for diffing
+    const currentCodes = await tuyaRequest<RawStatus>(`/v1.0/iot-03/devices/${id}/status`);
+    const desired = settingsToCommands(data);
+
+    // Only keep commands where value actually changed
+    const changed = desired.filter((cmd) => {
+      const cur = currentCodes.find((c) => c.code === cmd.code);
+      // If code not found on device, send it (might be first-time write)
+      if (!cur) return true;
+      // Deep compare — Tuya returns numbers, booleans, strings
+      return JSON.stringify(cur.value) !== JSON.stringify(cmd.value);
+    });
+
+    if (changed.length === 0) {
+      return { ok: true, changed: 0 };
+    }
+
     await tuyaRequest(`/v1.0/iot-03/devices/${id}/commands`, {
       method: "POST",
-      body: { commands },
+      body: { commands: changed },
     });
-    return { ok: true };
+    return { ok: true, changed: changed.length };
   });
 
 export const restartDeviceFn = createServerFn({ method: "POST" }).handler(async () => {
@@ -266,14 +306,14 @@ export const getPowerHistoryFn = createServerFn({ method: "GET" })
           : 30 * 24 * 3600_000;
     const start = end - spanMs;
     type LogsResp = { logs?: { event_time: number; value: string; code?: string }[] };
-    const codes = "battery_power,pv_power";
+    // Only fetch battery_power — pv_power was unused, wasting API quota
+    const codes = "battery_power";
     const size = data.range === "day" ? 100 : data.range === "week" ? 300 : 500;
     const res = await tuyaRequest<LogsResp>(
       `/v1.0/devices/${id}/logs?start_time=${start}&end_time=${end}&type=7&codes=${codes}&size=${size}`,
     ).catch(() => ({}) as LogsResp);
     const logs = res.logs || [];
     const battLogs = logs
-      .filter((l) => l.code === "battery_power")
       .map((l) => ({ t: l.event_time, v: Number(l.value) / 10 }))
       .filter((p) => Number.isFinite(p.v))
       .sort((a, b) => a.t - b.t);

@@ -9,15 +9,23 @@
 import { createHash, createHmac } from "node:crypto";
 
 const BASE_URL = process.env.TUYA_BASE_URL || "https://openapi.tuyaus.com";
+const FETCH_TIMEOUT_MS = 15_000;
 
 type TokenCache = { token: string; expiresAt: number } | null;
 let tokenCache: TokenCache = null;
+/** Dedup concurrent token-fetch requests so only one hits the wire. */
+let tokenPromise: Promise<string> | null = null;
 
 function sha256Hex(input: string) {
   return createHash("sha256").update(input, "utf8").digest("hex");
 }
 function hmacHex(input: string, secret: string) {
   return createHmac("sha256", secret).update(input, "utf8").digest("hex").toUpperCase();
+}
+
+/** Thin wrapper around fetch that bombs out after FETCH_TIMEOUT_MS. */
+function fetchWithTimeout(url: string, init: RequestInit): Promise<Response> {
+  return fetch(url, { ...init, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
 }
 
 function credentials() {
@@ -49,34 +57,45 @@ async function getAccessToken(): Promise<string> {
   if (tokenCache && tokenCache.expiresAt > Date.now() + 60_000) {
     return tokenCache.token;
   }
-  const { accessId, accessSecret } = credentials();
-  const path = "/v1.0/token?grant_type=1";
-  const t = Date.now().toString();
-  const sign = buildSign(accessId, accessSecret, "", "GET", path, "", t);
-  const res = await fetch(`${BASE_URL}${path}`, {
-    method: "GET",
-    headers: {
-      client_id: accessId,
-      sign,
-      t,
-      sign_method: "HMAC-SHA256",
-      "Content-Type": "application/json",
-    },
-  });
-  const json = (await res.json()) as {
-    success: boolean;
-    msg?: string;
-    code?: number;
-    result?: { access_token: string; expire_time: number };
-  };
-  if (!json.success || !json.result) {
-    throw new Error(`Tuya token ล้มเหลว: ${json.msg || json.code || res.status}`);
+
+  if (!tokenPromise) {
+    tokenPromise = (async () => {
+      try {
+        const { accessId, accessSecret } = credentials();
+        const path = "/v1.0/token?grant_type=1";
+        const t = Date.now().toString();
+        const sign = buildSign(accessId, accessSecret, "", "GET", path, "", t);
+        const res = await fetchWithTimeout(`${BASE_URL}${path}`, {
+          method: "GET",
+          headers: {
+            client_id: accessId,
+            sign,
+            t,
+            sign_method: "HMAC-SHA256",
+            "Content-Type": "application/json",
+          },
+        });
+        const json = (await res.json()) as {
+          success: boolean;
+          msg?: string;
+          code?: number;
+          result?: { access_token: string; expire_time: number };
+        };
+        if (!json.success || !json.result) {
+          throw new Error(`Tuya token ล้มเหลว: ${json.msg || json.code || res.status}`);
+        }
+        tokenCache = {
+          token: json.result.access_token,
+          expiresAt: Date.now() + json.result.expire_time * 1000,
+        };
+        return tokenCache.token;
+      } finally {
+        tokenPromise = null;
+      }
+    })();
   }
-  tokenCache = {
-    token: json.result.access_token,
-    expiresAt: Date.now() + json.result.expire_time * 1000,
-  };
-  return tokenCache.token;
+
+  return tokenPromise;
 }
 
 export async function tuyaRequest<T = unknown>(
@@ -90,7 +109,7 @@ export async function tuyaRequest<T = unknown>(
   const t = Date.now().toString();
   const sign = buildSign(accessId, accessSecret, token, method, path, bodyStr, t);
 
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetchWithTimeout(`${BASE_URL}${path}`, {
     method,
     headers: {
       client_id: accessId,

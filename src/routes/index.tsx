@@ -17,6 +17,7 @@ import { AlertBanner } from "@/components/alert-banner";
 import { deviceStatusQuery, powerHistoryQuery, restartDevice } from "@/lib/tuya/client";
 import { useAppSettings } from "@/lib/app-settings";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -39,7 +40,11 @@ function Dashboard() {
   const { refreshMs } = useAppSettings();
   const status = useQuery({ ...deviceStatusQuery, refetchInterval: refreshMs });
   const history = useQuery({ ...powerHistoryQuery("day"), refetchInterval: refreshMs * 2 });
-  const restart = useMutation({ mutationFn: restartDevice });
+  const restart = useMutation({
+    mutationFn: restartDevice,
+    onSuccess: () => toast.success("ส่งคำสั่งรีสตาร์ตแล้ว"),
+    onError: (e: Error) => toast.error(e.message || "รีสตาร์ตล้มเหลว"),
+  });
 
   if (status.isLoading && !status.data) return <LoadingScreen />;
   if (status.isError && !status.data)

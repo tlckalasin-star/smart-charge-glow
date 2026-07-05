@@ -49,10 +49,16 @@ function HistoryPage() {
     return { x, y: Math.round(p.power) };
   });
 
-  const totalKWh =
-    range === "day"
-      ? series.reduce((a, b) => a + b.y, 0) / 1000
-      : series.reduce((a, b) => a + b.y, 0) * 0.024;
+  // Estimate kWh from average power * time spanned.
+  // For "day": each bucket is 1 h → sum(W) / 1000 = kWh.
+  // For "week"/"month": each bucket is 1 day → avg(W) * 24 / 1000 = kWh per bucket.
+  // kWh from average power × time spanned.
+  // Day: each bucket = 1 h → totalW(W) / 1000 = kWh.
+  // Week/Month: each bucket = 1 d → totalW × 24(h) / 1000 = kWh.
+  // NOTE: missing-data periods (e.g. overnight) naturally lower the average,
+  // so this is a conservative floor, not an over-estimate.
+  const totalW = series.reduce((a, b) => a + b.y, 0);
+  const totalKWh = series.length === 0 ? 0 : totalW * (range === "day" ? 1 : 24) / 1000;
 
   return (
     <AppShell>
