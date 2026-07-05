@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { LayoutDashboard, LineChart, Settings, Info } from "lucide-react";
+import { LayoutDashboard, LineChart, Settings, Info, Bug } from "lucide-react";
 import type { ReactNode } from "react";
 
 const nav = [
@@ -7,6 +7,7 @@ const nav = [
   { to: "/history", label: "กราฟ", icon: LineChart },
   { to: "/settings", label: "ตั้งค่า", icon: Settings },
   { to: "/device-info", label: "อุปกรณ์", icon: Info },
+  { to: "/debug", label: "ดีบัก", icon: Bug },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -15,7 +16,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto max-w-md pb-24">{children}</div>
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-surface/90 backdrop-blur">
-        <div className="mx-auto grid max-w-md grid-cols-4">
+        <div className="mx-auto grid max-w-md grid-cols-5">
           {nav.map(({ to, label, icon: Icon }) => {
             const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
             return (

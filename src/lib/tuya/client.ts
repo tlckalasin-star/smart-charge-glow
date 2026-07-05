@@ -6,10 +6,12 @@ import {
   saveDeviceSettingsFn,
   restartDeviceFn,
   getPowerHistoryFn,
+  getRawStatusFn,
+  getSpecificationsFn,
 } from "./api.functions";
 import type { DeviceSettings } from "./types";
 
-/** Polling interval for live device data (ms). */
+/** Default polling interval for live device data (ms). Individual queries may override via useAppSettings. */
 export const REFRESH_MS = 32_000;
 
 export const deviceStatusQuery = queryOptions({
@@ -30,6 +32,19 @@ export const deviceInfoQuery = queryOptions({
   queryKey: ["tuya", "info"],
   queryFn: () => getDeviceInfoFn(),
   staleTime: 5 * 60_000,
+});
+
+export const rawStatusQuery = queryOptions({
+  queryKey: ["tuya", "raw"],
+  queryFn: () => getRawStatusFn(),
+  refetchInterval: REFRESH_MS,
+  staleTime: REFRESH_MS / 2,
+});
+
+export const specificationsQuery = queryOptions({
+  queryKey: ["tuya", "specs"],
+  queryFn: () => getSpecificationsFn(),
+  staleTime: 60 * 60_000,
 });
 
 export const powerHistoryQuery = (range: "day" | "week" | "month") =>
