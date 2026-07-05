@@ -28,7 +28,9 @@ function InfoPage() {
             <div className="max-w-sm rounded-3xl bg-surface p-6 text-center">
               <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
               <p className="mt-3 text-sm font-semibold">โหลดข้อมูลไม่สำเร็จ</p>
-              <p className="mt-1 text-xs text-muted-foreground break-words">{(error as Error)?.message}</p>
+              <p className="mt-1 text-xs text-muted-foreground break-words">
+                {(error as Error)?.message}
+              </p>
               <button
                 onClick={() => refetch()}
                 className="mt-4 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
@@ -80,14 +82,25 @@ function InfoPage() {
         </div>
 
         <p className="mt-4 px-2 text-xs leading-relaxed text-muted-foreground">
-          ข้อมูลนี้มาจากอุปกรณ์โดยตรง หากต้องการเปลี่ยน Wi-Fi โปรดรีเซ็ตอุปกรณ์แล้วเชื่อมต่อใหม่ผ่านแอป
+          ข้อมูลนี้มาจากอุปกรณ์โดยตรง หากต้องการเปลี่ยน Wi-Fi
+          โปรดรีเซ็ตอุปกรณ์แล้วเชื่อมต่อใหม่ผ่านแอป
         </p>
       </div>
     </AppShell>
   );
 }
 
-function InfoRow({ label, value, copy, mono }: { label: string; value: string; copy?: boolean; mono?: boolean }) {
+function InfoRow({
+  label,
+  value,
+  copy,
+  mono,
+}: {
+  label: string;
+  value: string;
+  copy?: boolean;
+  mono?: boolean;
+}) {
   const [done, setDone] = useState(false);
   const onCopy = async () => {
     try {
@@ -100,7 +113,9 @@ function InfoRow({ label, value, copy, mono }: { label: string; value: string; c
     <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3.5 last:border-b-0">
       <p className="text-sm shrink-0">{label}</p>
       <div className="flex min-w-0 items-center gap-2">
-        <span className={`truncate text-sm text-muted-foreground ${mono ? "font-mono" : ""}`}>{value}</span>
+        <span className={`truncate text-sm text-muted-foreground ${mono ? "font-mono" : ""}`}>
+          {value}
+        </span>
         {copy && (
           <button
             onClick={onCopy}
