@@ -1,0 +1,77 @@
+# Project Instructions — solarx-tuya-integration
+
+> This file is read by Windsurf IDE AI assistant.
+
+## Project Root
+
+All source code is inside the current directory (`smart-charge-glow/` is the project root when opened directly).
+
+## Commands
+
+```bash
+bun dev          # Start dev server
+bun build        # Production build (Nitro + Vercel)
+bun lint         # ESLint
+bun format       # Prettier
+```
+
+## Tech Stack
+
+- **Framework**: TanStack Start (full-stack React 19)
+- **Routing**: @tanstack/react-router (file-based, `src/routes/`)
+- **Data**: @tanstack/react-query + server functions
+- **Styling**: Tailwind CSS v4
+- **UI**: Radix UI + shadcn/ui (`src/components/ui/`)
+- **Charts**: Recharts | **Forms**: React Hook Form + Zod
+- **Server**: Nitro → Vercel | **IoT**: Tuya Cloud API
+- **Language**: TypeScript strict (no `any`, no `@ts-ignore`)
+
+## Key Files
+
+```
+src/
+├── routes/           # File-based routes (auto-registered)
+├── components/ui/    # shadcn/ui — do NOT modify directly
+├── lib/tuya/
+│   ├── api.functions.ts  # Server functions (Tuya API) — server-only
+│   ├── client.ts         # OAuth + HMAC-SHA256
+│   ├── mock.ts           # Mock data for offline dev
+│   └── types.ts
+├── server.ts         # SSR handler
+├── start.ts          # TanStack Start instance
+└── routeTree.gen.ts  # AUTO-GENERATED — never edit
+```
+
+## Rules
+
+- `@/` → `src/` path alias
+- Tuya API calls: server-side only (`'use server'`)
+- Never edit `routeTree.gen.ts`
+- Never add duplicate plugins to `vite.config.ts`
+- **Lovable connected**: never force push / rebase pushed commits
+
+---
+
+## Learning Mode (ALWAYS FOLLOW)
+
+After every change, explain:
+1. 🔍 **Why this file** — what problem, how it relates
+2. ⚙️ **How the logic works** — data flow, when called, state changes
+3. 🐛 **Root cause** (bugs) — real cause not just symptom
+4. ✨ **Better patterns** — if a better way exists, show it
+5. ⚠️ **Edge cases** — what's not yet handled
+
+---
+
+## Standard Workflow
+
+> Read → Think → Change one part → Verify
+> Never skip steps.
+
+1. Read instruction file + related files
+2. Explain structure and affected files
+3. Write ordered plan, wait for approval if high-risk
+4. Change one file/function at a time with explanations
+5. Run `bun lint` then `bun build` — both must pass
+6. Summarize diff in a table + answer Learning Mode questions
+7. Prepare Conventional Commit message (`feat/fix/refactor/chore`)

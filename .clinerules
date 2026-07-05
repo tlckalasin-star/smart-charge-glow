@@ -1,0 +1,70 @@
+# .clinerules — solarx-tuya-integration
+
+> Instruction file for Cline (VS Code AI extension).
+
+## Working Directory
+
+Source code is in `smart-charge-glow/`. Open that folder as workspace root, or prefix all paths with `smart-charge-glow/`.
+
+## Commands
+
+```bash
+bun dev       # Dev server (Vite + HMR)
+bun build     # Production (Nitro → Vercel)
+bun lint      # ESLint
+bun format    # Prettier
+```
+
+## Stack & Key Files
+
+| Concern | Technology | Location |
+|---------|-----------|----------|
+| Framework | TanStack Start (full-stack React 19) | `src/start.ts` |
+| Routing | @tanstack/react-router (file-based) | `src/routes/` |
+| Data | @tanstack/react-query + server functions | `src/lib/tuya/api.functions.ts` |
+| Styling | Tailwind CSS v4 | `src/styles.css` |
+| UI | Radix UI + shadcn/ui | `src/components/ui/` |
+| Charts | Recharts | used in routes |
+| Forms | React Hook Form + Zod | used in routes |
+| IoT API | Tuya Cloud (HMAC-SHA256) | `src/lib/tuya/client.ts` |
+| Server | Nitro → Vercel | `src/server.ts` |
+| Types | TypeScript strict | `src/lib/tuya/types.ts` |
+
+## Hard Rules
+
+- No `any`, no `@ts-ignore`
+- Never edit `src/routeTree.gen.ts` (auto-generated)
+- Tuya API → server-side only (`'use server'`)
+- `@/` alias → `src/`
+- shadcn/ui components → use as-is, don't rewrite
+- Lovable connected: no force push / rebase on pushed commits
+
+## Lovable Warning
+
+Connected to [Lovable](https://lovable.dev) — never force push, rebase, amend, or squash pushed commits. All pushes auto-sync.
+
+---
+
+## Learning Mode (MANDATORY)
+
+Every code change MUST include an explanation covering:
+
+- 🔍 **Why this file?** — original problem + how this file is involved
+- ⚙️ **How the logic works** — data flow, call chain, state transitions
+- 🐛 **Root cause** — for bugs: real cause not symptom
+- ✨ **Better pattern?** — show alternative if cleaner option exists
+- ⚠️ **Unhandled edge cases** — network errors, nulls, race conditions, etc.
+
+---
+
+## Standard Workflow (MANDATORY ORDER)
+
+**อ่านก่อน → คิดก่อน → แก้ทีละส่วน → ตรวจสอบเสมอ**
+
+1. **Read** — read this file + all related source files
+2. **Explain structure** — summarize current behavior, affected files, dependencies
+3. **Plan** — ordered list of changes + trade-offs, wait for approval if high-risk
+4. **Change one part at a time** — one file/function, explain each change
+5. **Verify** — run `bun lint` (must pass) → `bun build` (must succeed)
+6. **Diff summary** — table of changes + answer all 5 Learning Mode questions
+7. **Commit message** — Conventional Commits: `fix(scope): description`
