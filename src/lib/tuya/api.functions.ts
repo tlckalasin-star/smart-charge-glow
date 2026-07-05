@@ -96,6 +96,23 @@ function mapSettings(codes: RawStatus): DeviceSettings {
   };
 }
 
+export const getRawStatusFn = createServerFn({ method: "GET" }).handler(async () => {
+  const { tuyaRequest, getDeviceId } = await import("./server");
+  const id = getDeviceId();
+  const codes = await tuyaRequest<RawStatus>(`/v1.0/iot-03/devices/${id}/status`);
+  return codes;
+});
+
+type SpecFn = { code: string; name?: string; type?: string; values?: string };
+export const getSpecificationsFn = createServerFn({ method: "GET" }).handler(async () => {
+  const { tuyaRequest, getDeviceId } = await import("./server");
+  const id = getDeviceId();
+  const res = await tuyaRequest<{ functions?: SpecFn[]; status?: SpecFn[] }>(
+    `/v1.0/devices/${id}/specifications`,
+  ).catch(() => ({ functions: [], status: [] }));
+  return res;
+});
+
 export const getDeviceStatusFn = createServerFn({ method: "GET" }).handler(async () => {
   const { tuyaRequest, getDeviceId } = await import("./server");
   const id = getDeviceId();
