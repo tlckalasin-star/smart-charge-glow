@@ -151,7 +151,7 @@ function Dashboard() {
               <p className="text-sm font-semibold">วันนี้</p>
             </div>
             <span className="rounded-full bg-background/60 px-3 py-1 text-[10px] font-medium text-muted-foreground">
-              ทุก {REFRESH_MS / 1000} วิ
+              ทุก {Math.round(refreshMs / 1000)} วิ
             </span>
           </div>
           <ChartArea query={history} />
