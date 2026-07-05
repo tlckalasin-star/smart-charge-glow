@@ -7,14 +7,14 @@ type RawStatus = CodeValue[];
 /**
  * Tokenize a DP code or alias into lower-case tokens for fuzzy matching.
  */
-function tokensOf(s: string) {
+export function tokensOf(s: string) {
   return s
     .toLowerCase()
     .split(/[^a-z0-9]+/)
     .filter(Boolean);
 }
 
-function codeMatches(code: string, key: string) {
+export function codeMatches(code: string, key: string) {
   if (code === key) return true;
   if (code.toLowerCase() === key.toLowerCase()) return true;
 
@@ -57,7 +57,7 @@ function b(codes: RawStatus, key: string, fallback = false): boolean {
  * next tier, so an exact match on a later alias always wins over a fuzzy
  * match on an earlier one.
  */
-function pick(codes: RawStatus, keys: string[]): CodeValue | undefined {
+export function pick(codes: RawStatus, keys: string[]): CodeValue | undefined {
   for (const k of keys) {
     const found = codes.find((c) => c.code === k);
     if (found) return found;
@@ -73,7 +73,7 @@ function pick(codes: RawStatus, keys: string[]): CodeValue | undefined {
   return undefined;
 }
 
-function pickNum(codes: RawStatus, keys: string[], scale = 1, fallback = 0): number {
+export function pickNum(codes: RawStatus, keys: string[], scale = 1, fallback = 0): number {
   const item = pick(codes, keys);
   if (!item || typeof item.value !== "number") return fallback;
   return item.value / scale;
