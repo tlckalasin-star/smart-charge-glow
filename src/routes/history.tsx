@@ -1,7 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { AreaChart, Area, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import {
+  AreaChart,
+  Area,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
@@ -51,7 +59,9 @@ function HistoryPage() {
       <PageHeader title="กราฟพลังงาน" />
       <div className="space-y-4 px-5 pt-2">
         <div className="rounded-3xl bg-surface p-5">
-          <p className="text-xs text-muted-foreground">รวมพลังงาน{ranges.find((r) => r.id === range)?.label}นี้</p>
+          <p className="text-xs text-muted-foreground">
+            รวมพลังงาน{ranges.find((r) => r.id === range)?.label}นี้
+          </p>
           <p className="mt-1 font-mono text-3xl font-bold text-primary">
             {totalKWh.toFixed(2)} <span className="text-base text-muted-foreground">kWh</span>
           </p>
@@ -83,12 +93,17 @@ function HistoryPage() {
               <div className="flex h-full flex-col items-center justify-center gap-2 text-center text-xs text-destructive">
                 <AlertCircle className="h-5 w-5" />
                 <p>{(historyQ.error as Error).message || "โหลดกราฟล้มเหลว"}</p>
-                <button onClick={() => historyQ.refetch()} className="mt-1 rounded-full bg-destructive/15 px-3 py-1 font-medium">
+                <button
+                  onClick={() => historyQ.refetch()}
+                  className="mt-1 rounded-full bg-destructive/15 px-3 py-1 font-medium"
+                >
                   ลองใหม่
                 </button>
               </div>
             ) : series.length === 0 ? (
-              <div className="grid h-full place-items-center text-xs text-muted-foreground">ไม่มีข้อมูลในช่วงนี้</div>
+              <div className="grid h-full place-items-center text-xs text-muted-foreground">
+                ไม่มีข้อมูลในช่วงนี้
+              </div>
             ) : (
               <>
                 {historyQ.isFetching && (
@@ -105,9 +120,23 @@ function HistoryPage() {
                         <stop offset="100%" stopColor="oklch(0.78 0.16 70)" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 4" stroke="oklch(1 0 0 / 0.06)" vertical={false} />
-                    <XAxis dataKey="x" tick={{ fill: "oklch(0.7 0.02 260)", fontSize: 10 }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: "oklch(0.7 0.02 260)", fontSize: 10 }} axisLine={false} tickLine={false} width={28} />
+                    <CartesianGrid
+                      strokeDasharray="3 4"
+                      stroke="oklch(1 0 0 / 0.06)"
+                      vertical={false}
+                    />
+                    <XAxis
+                      dataKey="x"
+                      tick={{ fill: "oklch(0.7 0.02 260)", fontSize: 10 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fill: "oklch(0.7 0.02 260)", fontSize: 10 }}
+                      axisLine={false}
+                      tickLine={false}
+                      width={28}
+                    />
                     <Tooltip
                       contentStyle={{
                         background: "oklch(0.22 0.03 260)",
@@ -117,7 +146,13 @@ function HistoryPage() {
                       }}
                       formatter={(v: unknown) => [`${v} W`, "กำลัง"] as [string, string]}
                     />
-                    <Area type="monotone" dataKey="y" stroke="oklch(0.85 0.18 75)" strokeWidth={2} fill="url(#hg)" />
+                    <Area
+                      type="monotone"
+                      dataKey="y"
+                      stroke="oklch(0.85 0.18 75)"
+                      strokeWidth={2}
+                      fill="url(#hg)"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </>
@@ -126,10 +161,17 @@ function HistoryPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <Stat label="สูงสุด" value={series.length ? `${Math.max(...series.map((p) => p.y))} W` : "-"} />
+          <Stat
+            label="สูงสุด"
+            value={series.length ? `${Math.max(...series.map((p) => p.y))} W` : "-"}
+          />
           <Stat
             label="เฉลี่ย"
-            value={series.length ? `${(series.reduce((a, b) => a + b.y, 0) / series.length).toFixed(1)} W` : "-"}
+            value={
+              series.length
+                ? `${(series.reduce((a, b) => a + b.y, 0) / series.length).toFixed(1)} W`
+                : "-"
+            }
           />
           <Stat label="อุณหภูมิ" value={status.data ? `${status.data.temperature}°C` : "-"} />
         </div>

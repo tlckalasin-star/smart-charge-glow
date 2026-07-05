@@ -1,9 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { RefreshCw, Sun, BatteryCharging, Lightbulb, Thermometer, Zap, TrendingUp, AlertCircle, Loader2 } from "lucide-react";
+import {
+  RefreshCw,
+  Sun,
+  BatteryCharging,
+  Lightbulb,
+  Thermometer,
+  Zap,
+  TrendingUp,
+  AlertCircle,
+  Loader2,
+} from "lucide-react";
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip } from "recharts";
 import { AppShell } from "@/components/app-shell";
-import { deviceStatusQuery, powerHistoryQuery, restartDevice, REFRESH_MS } from "@/lib/tuya/client";
+import { AlertBanner } from "@/components/alert-banner";
+import { deviceStatusQuery, powerHistoryQuery, restartDevice } from "@/lib/tuya/client";
+import { useAppSettings } from "@/lib/app-settings";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
@@ -24,23 +36,28 @@ const stateLabel: Record<string, { th: string; tone: string }> = {
 };
 
 function Dashboard() {
-  const status = useQuery(deviceStatusQuery);
-  const history = useQuery(powerHistoryQuery("day"));
+  const { refreshMs } = useAppSettings();
+  const status = useQuery({ ...deviceStatusQuery, refetchInterval: refreshMs });
+  const history = useQuery({ ...powerHistoryQuery("day"), refetchInterval: refreshMs * 2 });
   const restart = useMutation({ mutationFn: restartDevice });
 
   if (status.isLoading && !status.data) return <LoadingScreen />;
-  if (status.isError && !status.data) return <ErrorScreen error={status.error as Error} onRetry={() => status.refetch()} />;
+  if (status.isError && !status.data)
+    return <ErrorScreen error={status.error as Error} onRetry={() => status.refetch()} />;
   const data = status.data!;
   const s = stateLabel[data.state];
   const refreshingLive = status.isFetching;
 
   return (
     <AppShell>
+      <AlertBanner status={data} />
       {/* Header */}
       <div className="px-5 pt-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-xs uppercase tracking-widest text-muted-foreground">MPPT Controller</p>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">
+              MPPT Controller
+            </p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight">{data.model}</h1>
           </div>
           <button
@@ -54,7 +71,12 @@ function Dashboard() {
         </div>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
-          <span className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium", s.tone)}>
+          <span
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium",
+              s.tone,
+            )}
+          >
             <span className="h-1.5 w-1.5 rounded-full bg-current" />
             {s.th}
           </span>
@@ -82,7 +104,9 @@ function Dashboard() {
         <div className="col-span-3 rounded-3xl bg-gradient-to-br from-[oklch(0.3_0.06_160)] to-surface p-5 glow-battery">
           <p className="text-xs text-muted-foreground">แบตเตอรี่</p>
           <div className="mt-2 flex items-end gap-1">
-            <span className="font-mono text-5xl font-bold text-battery-glow">{data.battery.percent}</span>
+            <span className="font-mono text-5xl font-bold text-battery-glow">
+              {data.battery.percent}
+            </span>
             <span className="mb-1.5 text-lg text-muted-foreground">%</span>
           </div>
           <div className="mt-4 h-2 overflow-hidden rounded-full bg-background/40">
@@ -96,8 +120,19 @@ function Dashboard() {
           </p>
         </div>
         <div className="col-span-2 flex flex-col gap-3">
-          <MiniCard label="วันนี้" value={data.energy.day} unit="kWh" icon={<Zap className="h-3.5 w-3.5" />} accent="text-primary" />
-          <MiniCard label="รวม" value={data.energy.total} unit="kWh" icon={<TrendingUp className="h-3.5 w-3.5" />} />
+          <MiniCard
+            label="วันนี้"
+            value={data.energy.day}
+            unit="kWh"
+            icon={<Zap className="h-3.5 w-3.5" />}
+            accent="text-primary"
+          />
+          <MiniCard
+            label="รวม"
+            value={data.energy.total}
+            unit="kWh"
+            icon={<TrendingUp className="h-3.5 w-3.5" />}
+          />
         </div>
       </div>
 
@@ -135,7 +170,9 @@ function Dashboard() {
             <p className="text-xs text-muted-foreground">กำลังแบตเตอรี่</p>
             <p className="font-mono text-lg font-semibold">{data.battery.power.toFixed(1)} W</p>
           </div>
-          <p className="font-mono text-sm text-muted-foreground">{data.battery.current.toFixed(1)} A</p>
+          <p className="font-mono text-sm text-muted-foreground">
+            {data.battery.current.toFixed(1)} A
+          </p>
         </div>
       </div>
 
@@ -148,7 +185,7 @@ function Dashboard() {
               <p className="text-sm font-semibold">วันนี้</p>
             </div>
             <span className="rounded-full bg-background/60 px-3 py-1 text-[10px] font-medium text-muted-foreground">
-              ทุก {REFRESH_MS / 1000} วิ
+              ทุก {Math.round(refreshMs / 1000)} วิ
             </span>
           </div>
           <ChartArea query={history} />
@@ -177,7 +214,10 @@ function ChartArea({ query }: { query: HistoryQuery }) {
       <div className="flex h-44 flex-col items-center justify-center gap-2 text-center text-xs text-destructive">
         <AlertCircle className="h-5 w-5" />
         <p>{(error as Error).message || "โหลดกราฟล้มเหลว"}</p>
-        <button onClick={() => refetch()} className="mt-1 rounded-full bg-destructive/15 px-3 py-1 font-medium">
+        <button
+          onClick={() => refetch()}
+          className="mt-1 rounded-full bg-destructive/15 px-3 py-1 font-medium"
+        >
           ลองใหม่
         </button>
       </div>
@@ -226,7 +266,13 @@ function ChartArea({ query }: { query: HistoryQuery }) {
             labelFormatter={(h) => `${h}:00`}
             formatter={(v: unknown) => [`${v} W`, "กำลัง"] as [string, string]}
           />
-          <Area type="monotone" dataKey="power" stroke="oklch(0.85 0.18 75)" strokeWidth={2} fill="url(#g1)" />
+          <Area
+            type="monotone"
+            dataKey="power"
+            stroke="oklch(0.85 0.18 75)"
+            strokeWidth={2}
+            fill="url(#g1)"
+          />
         </AreaChart>
       </ResponsiveContainer>
     </div>
@@ -321,7 +367,9 @@ function ErrorScreen({ error, onRetry }: { error: Error; onRetry: () => void }) 
         <div className="max-w-sm rounded-3xl bg-surface p-6 text-center">
           <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
           <p className="mt-3 text-sm font-semibold">เชื่อมต่ออุปกรณ์ไม่สำเร็จ</p>
-          <p className="mt-1 text-xs text-muted-foreground break-words">{error?.message || "ไม่ทราบสาเหตุ"}</p>
+          <p className="mt-1 text-xs text-muted-foreground break-words">
+            {error?.message || "ไม่ทราบสาเหตุ"}
+          </p>
           <button
             onClick={onRetry}
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"

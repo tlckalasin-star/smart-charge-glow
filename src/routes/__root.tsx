@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "../components/ui/sonner";
+import { AppSettingsProvider } from "../lib/app-settings";
 
 function NotFoundComponent() {
   return (
@@ -67,7 +68,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#0a0e1a" },
       { title: "MPPT HM-6096 — ตัวควบคุมการชาร์จโซลาร์" },
-      { name: "description", content: "แอปควบคุมและติดตามค่า MPPT Solar Charge Controller HM-6096 แบบเรียลไทม์" },
+      {
+        name: "description",
+        content: "แอปควบคุมและติดตามค่า MPPT Solar Charge Controller HM-6096 แบบเรียลไทม์",
+      },
     ],
     links: [{ rel: "stylesheet", href: appCss }],
   }),
@@ -95,8 +99,10 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
-      <Toaster position="top-center" />
+      <AppSettingsProvider>
+        <Outlet />
+        <Toaster position="top-center" />
+      </AppSettingsProvider>
     </QueryClientProvider>
   );
 }
