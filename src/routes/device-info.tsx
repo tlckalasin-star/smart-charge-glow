@@ -107,7 +107,9 @@ function InfoRow({
       await navigator.clipboard.writeText(value);
       setDone(true);
       setTimeout(() => setDone(false), 1500);
-    } catch {}
+    } catch {
+      /* ignore */
+    }
   };
   return (
     <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-3.5 last:border-b-0">
