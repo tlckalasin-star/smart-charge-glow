@@ -17,10 +17,19 @@ function tokensOf(s: string) {
 function codeMatches(code: string, key: string) {
   if (code === key) return true;
   if (code.toLowerCase() === key.toLowerCase()) return true;
+
   const codeTokens = tokensOf(code);
   const keyTokens = tokensOf(key);
-  // require every token in the candidate key to appear in the actual code
-  return keyTokens.every((t) => codeTokens.includes(t));
+
+  // Require the SAME set of tokens (order-independent), not just "every key
+  // token appears somewhere in code". A subset check lets a short alias like
+  // "battery_voltage" ([battery, voltage]) wrongly match a longer, semantically
+  // different dp code like "battery_voltage_class" ([battery, voltage, class])
+  // — those are different settings entirely, not aliases of each other.
+  if (codeTokens.length !== keyTokens.length) return false;
+
+  const codeSet = new Set(codeTokens);
+  return keyTokens.every((t) => codeSet.has(t));
 }
 
 /** Normalize a Tuya DP value with heuristic scaling. */
@@ -38,21 +47,32 @@ function b(codes: RawStatus, key: string, fallback = false): boolean {
   return typeof item?.value === "boolean" ? item.value : fallback;
 }
 
+/**
+ * Finds a dp code entry matching one of the candidate `keys`, trying:
+ *   1. exact match
+ *   2. case-insensitive match
+ *   3. token-set fuzzy match (same tokens, different order/case/separators)
+ *
+ * Each tier is tried across ALL candidate keys before falling through to the
+ * next tier, so an exact match on a later alias always wins over a fuzzy
+ * match on an earlier one.
+ */
 function pick(codes: RawStatus, keys: string[]): CodeValue | undefined {
-  // Try exact matches first, then case-insensitive, then token-based fuzzy match.
   for (const k of keys) {
-    // exact
-    let found = codes.find((c) => c.code === k);
+    const found = codes.find((c) => c.code === k);
     if (found) return found;
-    // case-insensitive
-    found = codes.find((c) => c.code.toLowerCase() === k.toLowerCase());
+  }
+  for (const k of keys) {
+    const found = codes.find((c) => c.code.toLowerCase() === k.toLowerCase());
     if (found) return found;
-    // token-based fuzzy match (all tokens in key must appear in code)
-    found = codes.find((c) => codeMatches(c.code, k));
+  }
+  for (const k of keys) {
+    const found = codes.find((c) => codeMatches(c.code, k));
     if (found) return found;
   }
   return undefined;
 }
+
 function pickNum(codes: RawStatus, keys: string[], scale = 1, fallback = 0): number {
   const item = pick(codes, keys);
   if (!item || typeof item.value !== "number") return fallback;
