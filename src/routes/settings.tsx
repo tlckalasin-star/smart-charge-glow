@@ -293,6 +293,12 @@ function AppTab() {
     alertRules,
     setAlertRules,
     updateRule,
+    mascotEnabled,
+    setMascotEnabled,
+    energyPricePerKwh,
+    setEnergyPricePerKwh,
+    monthlyTargetKwh,
+    setMonthlyTargetKwh,
   } = useAppSettings();
   const seconds = Math.round(refreshMs / 1000);
 
