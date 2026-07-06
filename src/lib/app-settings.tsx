@@ -119,6 +119,11 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
         setSettings((s) => ({ ...s, refreshMs: Math.max(5_000, Math.min(300_000, v)) })),
       setReduceMotion: (v) => setSettings((s) => ({ ...s, reduceMotion: v })),
       setAlertRules: (rules) => setSettings((s) => ({ ...s, alertRules: rules })),
+      setMascotEnabled: (v) => setSettings((s) => ({ ...s, mascotEnabled: v })),
+      setEnergyPricePerKwh: (v) =>
+        setSettings((s) => ({ ...s, energyPricePerKwh: Math.max(0, v) })),
+      setMonthlyTargetKwh: (v) =>
+        setSettings((s) => ({ ...s, monthlyTargetKwh: Math.max(1, v) })),
       updateRule: (id, patch) =>
         setSettings((s) => ({
           ...s,
