@@ -198,6 +198,13 @@ function Dashboard() {
           <ChartArea query={history} />
         </div>
       </div>
+
+      {/* Monthly energy receipt */}
+      <div className="mt-4 px-5 pb-4">
+        <MonthlyReceipt />
+      </div>
+
+      <SolarBuddy />
     </AppShell>
   );
 }
