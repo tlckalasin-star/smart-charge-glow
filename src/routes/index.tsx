@@ -14,6 +14,8 @@ import {
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip } from "recharts";
 import { AppShell } from "@/components/app-shell";
 import { AlertBanner } from "@/components/alert-banner";
+import { SolarBuddy } from "@/components/solar-buddy";
+import { MonthlyReceipt } from "@/components/monthly-receipt";
 import { deviceStatusQuery, powerHistoryQuery, restartDevice } from "@/lib/tuya/client";
 import { useAppSettings } from "@/lib/app-settings";
 import { cn } from "@/lib/utils";
@@ -196,6 +198,13 @@ function Dashboard() {
           <ChartArea query={history} />
         </div>
       </div>
+
+      {/* Monthly energy receipt */}
+      <div className="mt-4 px-5 pb-4">
+        <MonthlyReceipt />
+      </div>
+
+      <SolarBuddy />
     </AppShell>
   );
 }

@@ -14,6 +14,9 @@ export type AppSettings = {
   refreshMs: number;
   reduceMotion: boolean;
   alertRules: AlertRule[];
+  mascotEnabled: boolean;
+  energyPricePerKwh: number;
+  monthlyTargetKwh: number;
 };
 
 const STORAGE_KEY = "smart-charge-glow:app-settings-v1";
@@ -49,6 +52,9 @@ const DEFAULTS: AppSettings = {
   refreshMs: 32_000,
   reduceMotion: false,
   alertRules: DEFAULT_RULES,
+  mascotEnabled: true,
+  energyPricePerKwh: 4.5,
+  monthlyTargetKwh: 60,
 };
 
 type Ctx = AppSettings & {
@@ -56,6 +62,9 @@ type Ctx = AppSettings & {
   setReduceMotion: (v: boolean) => void;
   setAlertRules: (rules: AlertRule[]) => void;
   updateRule: (id: string, patch: Partial<AlertRule>) => void;
+  setMascotEnabled: (v: boolean) => void;
+  setEnergyPricePerKwh: (v: number) => void;
+  setMonthlyTargetKwh: (v: number) => void;
 };
 
 const AppSettingsCtx = createContext<Ctx | null>(null);
@@ -70,6 +79,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       if (!raw) return;
       const parsed = JSON.parse(raw) as Partial<AppSettings>;
       setSettings((prev) => ({
+        ...prev,
         refreshMs: typeof parsed.refreshMs === "number" ? parsed.refreshMs : prev.refreshMs,
         reduceMotion:
           typeof parsed.reduceMotion === "boolean" ? parsed.reduceMotion : prev.reduceMotion,
@@ -77,6 +87,16 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
           Array.isArray(parsed.alertRules) && parsed.alertRules.length
             ? parsed.alertRules
             : prev.alertRules,
+        mascotEnabled:
+          typeof parsed.mascotEnabled === "boolean" ? parsed.mascotEnabled : prev.mascotEnabled,
+        energyPricePerKwh:
+          typeof parsed.energyPricePerKwh === "number"
+            ? parsed.energyPricePerKwh
+            : prev.energyPricePerKwh,
+        monthlyTargetKwh:
+          typeof parsed.monthlyTargetKwh === "number"
+            ? parsed.monthlyTargetKwh
+            : prev.monthlyTargetKwh,
       }));
     } catch {
       /* ignore */
@@ -99,6 +119,11 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
         setSettings((s) => ({ ...s, refreshMs: Math.max(5_000, Math.min(300_000, v)) })),
       setReduceMotion: (v) => setSettings((s) => ({ ...s, reduceMotion: v })),
       setAlertRules: (rules) => setSettings((s) => ({ ...s, alertRules: rules })),
+      setMascotEnabled: (v) => setSettings((s) => ({ ...s, mascotEnabled: v })),
+      setEnergyPricePerKwh: (v) =>
+        setSettings((s) => ({ ...s, energyPricePerKwh: Math.max(0, v) })),
+      setMonthlyTargetKwh: (v) =>
+        setSettings((s) => ({ ...s, monthlyTargetKwh: Math.max(1, v) })),
       updateRule: (id, patch) =>
         setSettings((s) => ({
           ...s,

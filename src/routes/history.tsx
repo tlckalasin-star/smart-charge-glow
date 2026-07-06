@@ -13,6 +13,7 @@ import {
 import { AlertCircle, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
+import { MonthlyReceipt } from "@/components/monthly-receipt";
 import { deviceStatusQuery, powerHistoryQuery } from "@/lib/tuya/client";
 import { cn } from "@/lib/utils";
 
@@ -181,6 +182,8 @@ function HistoryPage() {
           />
           <Stat label="อุณหภูมิ" value={status.data ? `${status.data.temperature}°C` : "-"} />
         </div>
+
+        <MonthlyReceipt />
       </div>
     </AppShell>
   );

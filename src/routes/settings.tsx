@@ -293,6 +293,12 @@ function AppTab() {
     alertRules,
     setAlertRules,
     updateRule,
+    mascotEnabled,
+    setMascotEnabled,
+    energyPricePerKwh,
+    setEnergyPricePerKwh,
+    monthlyTargetKwh,
+    setMonthlyTargetKwh,
   } = useAppSettings();
   const seconds = Math.round(refreshMs / 1000);
 
@@ -331,7 +337,40 @@ function AppTab() {
         <Row label="ลดการเคลื่อนไหว" hint="Reduce motion">
           <Switch checked={reduceMotion} onCheckedChange={setReduceMotion} />
         </Row>
+        <Row label="แสดงโซลาร์บัดดี้" hint="Mascot on dashboard">
+          <Switch checked={mascotEnabled} onCheckedChange={setMascotEnabled} />
+        </Row>
       </Section>
+
+      <Section icon={<Zap className="h-4 w-4" />} title="โซลาร์บัดดี้ · ใบเสร็จ">
+        <Row label="ราคาไฟต่อหน่วย" hint="บาท / kWh">
+          <div className="flex items-center gap-1">
+            <Input
+              type="number"
+              step={0.1}
+              min={0}
+              value={energyPricePerKwh}
+              onChange={(e) => setEnergyPricePerKwh(Number(e.target.value))}
+              className="h-9 w-20 bg-background text-right font-mono"
+            />
+            <span className="text-xs text-muted-foreground">฿</span>
+          </div>
+        </Row>
+        <Row label="เป้าหมายเดือน" hint="kWh / เดือน">
+          <div className="flex items-center gap-1">
+            <Input
+              type="number"
+              step={1}
+              min={1}
+              value={monthlyTargetKwh}
+              onChange={(e) => setMonthlyTargetKwh(Number(e.target.value))}
+              className="h-9 w-20 bg-background text-right font-mono"
+            />
+            <span className="text-xs text-muted-foreground">kWh</span>
+          </div>
+        </Row>
+      </Section>
+
 
       <Section icon={<Bell className="h-4 w-4" />} title="เกณฑ์แจ้งเตือน">
         <div className="space-y-3 py-2">
