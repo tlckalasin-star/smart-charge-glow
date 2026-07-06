@@ -14,6 +14,9 @@ export type AppSettings = {
   refreshMs: number;
   reduceMotion: boolean;
   alertRules: AlertRule[];
+  mascotEnabled: boolean;
+  energyPricePerKwh: number;
+  monthlyTargetKwh: number;
 };
 
 const STORAGE_KEY = "smart-charge-glow:app-settings-v1";
