@@ -14,6 +14,8 @@ import {
 import { AreaChart, Area, ResponsiveContainer, XAxis, Tooltip } from "recharts";
 import { AppShell } from "@/components/app-shell";
 import { AlertBanner } from "@/components/alert-banner";
+import { SolarBuddy } from "@/components/solar-buddy";
+import { MonthlyReceipt } from "@/components/monthly-receipt";
 import { deviceStatusQuery, powerHistoryQuery, restartDevice } from "@/lib/tuya/client";
 import { useAppSettings } from "@/lib/app-settings";
 import { cn } from "@/lib/utils";
