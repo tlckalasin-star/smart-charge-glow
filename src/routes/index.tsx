@@ -289,15 +289,6 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Energy stats */}
-      <div className="mt-3 px-5">
-        <EnergyStatsCard
-          todayKWh={data.energy.day}
-          totalKWh={data.energy.total}
-          historyData={history.data ?? []}
-        />
-      </div>
-
       {/* Chart */}
       <div className="mt-5 px-5 pb-6">
         <div className="rounded-2xl bg-surface p-4">
