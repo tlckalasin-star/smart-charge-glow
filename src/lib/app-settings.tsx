@@ -52,6 +52,9 @@ const DEFAULTS: AppSettings = {
   refreshMs: 32_000,
   reduceMotion: false,
   alertRules: DEFAULT_RULES,
+  mascotEnabled: true,
+  energyPricePerKwh: 4.5,
+  monthlyTargetKwh: 60,
 };
 
 type Ctx = AppSettings & {
@@ -59,6 +62,9 @@ type Ctx = AppSettings & {
   setReduceMotion: (v: boolean) => void;
   setAlertRules: (rules: AlertRule[]) => void;
   updateRule: (id: string, patch: Partial<AlertRule>) => void;
+  setMascotEnabled: (v: boolean) => void;
+  setEnergyPricePerKwh: (v: number) => void;
+  setMonthlyTargetKwh: (v: number) => void;
 };
 
 const AppSettingsCtx = createContext<Ctx | null>(null);
