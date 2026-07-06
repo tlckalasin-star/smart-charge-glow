@@ -79,6 +79,7 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
       if (!raw) return;
       const parsed = JSON.parse(raw) as Partial<AppSettings>;
       setSettings((prev) => ({
+        ...prev,
         refreshMs: typeof parsed.refreshMs === "number" ? parsed.refreshMs : prev.refreshMs,
         reduceMotion:
           typeof parsed.reduceMotion === "boolean" ? parsed.reduceMotion : prev.reduceMotion,
@@ -86,6 +87,16 @@ export function AppSettingsProvider({ children }: { children: ReactNode }) {
           Array.isArray(parsed.alertRules) && parsed.alertRules.length
             ? parsed.alertRules
             : prev.alertRules,
+        mascotEnabled:
+          typeof parsed.mascotEnabled === "boolean" ? parsed.mascotEnabled : prev.mascotEnabled,
+        energyPricePerKwh:
+          typeof parsed.energyPricePerKwh === "number"
+            ? parsed.energyPricePerKwh
+            : prev.energyPricePerKwh,
+        monthlyTargetKwh:
+          typeof parsed.monthlyTargetKwh === "number"
+            ? parsed.monthlyTargetKwh
+            : prev.monthlyTargetKwh,
       }));
     } catch {
       /* ignore */
