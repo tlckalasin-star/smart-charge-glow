@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SolarX · Ultramarine Energy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ultra-deep: #060816;
+  --ultra-dark: #0b0d24;
+  --ultra-mid: #111438;
+  --ultra-surface: rgba(17, 20, 56, 0.6);
+  --ultramarine: #2d1be8;
+  --ultramarine-glow: #4b3aff;
+  --cyan: #00d4ff;
+  --cyan-dim: rgba(0, 212, 255, 0.15);
+  --amber: #ffb347;
+  --amber-dim: rgba(255, 179, 71, 0.15);
+  --pulse: #cc66ff;
+  --text-primary: #e8edff;
+  --text-secondary: rgba(232, 237, 255, 0.6);
+  --text-dim: rgba(232, 237, 255, 0.3);
+  --glass: rgba(17, 20, 56, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.06);
+  --radius: 20px;
+  --radius-sm: 12px;
+}
+
+@keyframes aurora {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  50% { transform: translateY(-120px) scale(0.5); }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-ring {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+@keyframes liquid-wave {
+  0% { transform: translateX(-50%) translateY(0) scaleY(1); }
+  50% { transform: translateX(-30%) translateY(-2px) scaleY(1.02); }
+  100% { transform: translateX(-50%) translateY(0) scaleY(1); }
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+  25%, 75% { opacity: 0.9; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(45, 27, 232, 0.3), 0 0 60px rgba(45, 27, 232, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(45, 27, 232, 0.5), 0 0 80px rgba(45, 27, 232, 0.2); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes energy-flow {
+  0% { stroke-dashoffset: 200; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes radar-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--ultra-deep);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* Aurora background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 20%, rgba(45, 27, 232, 0.15) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(0, 212, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(204, 102, 255, 0.05) 0%, transparent 50%),
+    linear-gradient(135deg, var(--ultra-deep) 0%, var(--ultra-dark) 50%, #0a0c2e 100%);
+  background-size: 200% 200%;
+  animation: aurora 20s ease infinite;
+}
+
+/* Noise overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  pointer-events: none;
+}
+
+.dashboard {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 1280px;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 48px;
+  animation: slide-up 0.8s ease both;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.brand-mark {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.logo-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-name {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 700;
+  font-size: 22px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, var(--text-primary) 0%, var(--cyan) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-sub {
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  font-weight: 400;
+}
+
+.header-right {
+  text-align: right;
+}
+
+.energy-now {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.energy-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--cyan) 0%, var(--ultramarine-glow) 50%, var(--pulse) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.energy-unit {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  -webkit-text-fill-color: var(--text-secondary);
+  margin-left: 4px;
+}
+
+/* Main grid */
+.grid-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Center column */
+.col-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Energy Orb */
+.energy-orb-panel {
+  position: relative;
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 32px;
+  overflow: hidden;
+  animation: slide-up 0.8s ease 0.1s both, glow-pulse 4s ease-in-out infinite;
+}
+
+.energy-orb-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 50%, rgba(45, 27, 232, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.orb-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 260px;
+}
+
+.orb-ring {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.orb-ring:nth-child(1) {
+  width: 260px;
+  height: 260px;
+  border-color: rgba(45, 27, 232, 0.15);
+  animation: spin 30s linear infinite;
+}
+
+.orb-ring:nth-child(2) {
+  width: 220px;
+  height: 220px;
+  border-color: transparent;
+  border-top-color: rgba(0, 212, 255, 0.3);
+  border-right-color: rgba(204, 102, 255, 0.2);
+  animation: spin 20s linear infinite reverse;
+}
+
+.orb-ring:nth-child(3) {
+  width: 180px;
+  height: 180px;
+  border-color: transparent;
+  border-bottom-color: rgba(0, 212, 255, 0.2);
+  border-left-color: rgba(45, 27, 232, 0.3);
+  animation: spin 15s linear infinite;
+}
+
+.orb-core {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, rgba(0, 212, 255, 0.6), rgba(45, 27, 232, 0.4) 40%, rgba(45, 27, 232, 0.1) 70%, transparent);
+  filter: blur(8px);
+  animation: pulse-ring 3s ease-in-out infinite, breathe 4s ease-in-out infinite;
+}
+
+.orb-core-inner {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #fff, var(--cyan) 30%, var(--ultramarine) 70%);
+  filter: blur(2px);
+  box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), 0 0 80px rgba(45, 27, 232, 0.2);
+  animation: breathe 3s ease-in-out infinite;
+}
+
+.orb-center-text {
+  position: absolute;
+  text-align: center;
+  z-index: 2;
+}
+
+.orb-percent {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 52px;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, var(--text-primary) 0%, var(--cyan) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+}
+
+.orb-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* Floating particles */
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 6px var(--cyan), 0 0 12px rgba(0, 212, 255, 0.3);
+  animation: float 6s ease-in-out infinite;
+}
+
+.particle:nth-child(1) { left: 20%; bottom: 10%; animation-delay: 0s; animation-duration: 5s; }
+.particle:nth-child(2) { left: 40%; bottom: 15%; animation-delay: 1s; animation-duration: 7s; background: var(--pulse); box-shadow: 0 0 6px var(--pulse); }
+.particle:nth-child(3) { left: 60%; bottom: 5%; animation-delay: 2s; animation-duration: 6s; }
+.particle:nth-child(4) { left: 80%; bottom: 20%; animation-delay: 0.5s; animation-duration: 8s; background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+.particle:nth-child(5) { left: 30%; bottom: 25%; animation-delay: 3s; animation-duration: 5.5s; }
+.particle:nth-child(6) { left: 70%; bottom: 8%; animation-delay: 1.5s; animation-duration: 6.5s; background: var(--ultramarine-glow); box-shadow: 0 0 6px var(--ultramarine-glow); }
+
+/* State badge */
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: var(--cyan-dim);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  animation: slide-up 0.8s ease 0.2s both;
+}
+
+.state-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+  animation: flicker 2s ease-in-out infinite;
+}
+
+/* KPI Row */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  animation: slide-up 0.8s ease 0.3s both;
+}
+
+.kpi-card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.kpi-card-pv::before { background: linear-gradient(90deg, var(--amber), var(--ultramarine-glow)); }
+.kpi-card-batt::before { background: linear-gradient(90deg, var(--cyan), var(--ultramarine-glow)); }
+.kpi-card-load::before { background: linear-gradient(90deg, var(--pulse), var(--ultramarine)); }
+.kpi-card-temp::before { background: linear-gradient(90deg, var(--amber), #ff6b6b); }
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.kpi-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+
+.kpi-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.kpi-value-pv { color: var(--amber); }
+.kpi-value-batt { color: var(--cyan); }
+.kpi-value-load { color: var(--pulse); }
+.kpi-value-temp { color: #ff8a8a; }
+
+.kpi-unit {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: 2px;
+}
+
+.kpi-detail {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+  font-weight: 400;
+}
+
+/* Side column */
+.col-secondary {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: slide-up 0.8s ease 0.4s both;
+}
+
+/* Battery visualization */
+.battery-panel {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  flex: 1;
+}
+
+.battery-title {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.battery-visual {
+  position: relative;
+  height: 180px;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  border: 1px solid rgba(0, 212, 255, 0.1);
+}
+
+.battery-liquid {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 76%;
+  background: linear-gradient(180deg, rgba(0, 212, 255, 0.4), rgba(45, 27, 232, 0.6));
+  border-radius: 0 0 15px 15px;
+  transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.battery-liquid::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(0, 212, 255, 0.6) 0%, transparent 70%);
+}
+
+.battery-liquid::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 0;
+  width: 200%;
+  height: 12px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    rgba(255, 255, 255, 0.1) 2px,
+    transparent 4px,
+    transparent 20px
+  );
+  animation: liquid-wave 3s ease-in-out infinite;
+}
+
+.battery-level-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.battery-percent {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 44px;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+.battery-volt {
+  font-family: 'Chakra Petch', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Battery terminals */
+.terminal-top {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 6px;
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 3px 3px 0 0;
+}
+
+/* Energy flow */
+.flow-panel {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.flow-title {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+}
+
+.flow-visual {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.flow-node {
+  text-align: center;
+}
+
+.flow-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 8px;
+  font-size: 18px;
+}
+
+.flow-icon-pv { background: rgba(255, 179, 71, 0.15); color: var(--amber); }
+.flow-icon-batt { background: rgba(0, 212, 255, 0.15); color: var(--cyan); }
+.flow-icon-load { background: rgba(204, 102, 255, 0.15); color: var(--pulse); }
+
+.flow-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.flow-arrow {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, var(--amber-dim), var(--cyan-dim));
+  position: relative;
+  max-width: 80px;
+}
+
+.flow-arrow::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid var(--cyan);
+  border-top: 2px solid var(--cyan);
+  rotate: 45deg;
+}
+
+.flow-arrow-active {
+  background: linear-gradient(90deg, var(--amber), var(--cyan));
+  box-shadow: 0 0 8px rgba(0, 212, 255, 0.3);
+}
+
+/* Energy history chart */
+.chart-panel {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  animation: slide-up 0.8s ease 0.5s both;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.chart-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.chart-tab {
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--glass-border);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chart-tab:hover {
+  border-color: rgba(0, 212, 255, 0.3);
+  color: var(--text-secondary);
+}
+
+.chart-tab.active {
+  background: var(--cyan-dim);
+  border-color: rgba(0, 212, 255, 0.3);
+  color: var(--cyan);
+}
+
+.chart-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 100px;
+  padding-top: 8px;
+}
+
+.chart-bar {
+  flex: 1;
+  border-radius: 3px 3px 0 0;
+  min-height: 4px;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chart-bar:hover {
+  opacity: 0.8;
+  transform: scaleY(1.05);
+  transform-origin: bottom;
+}
+
+.chart-bar-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--ultra-mid);
+  border: 1px solid var(--glass-border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  margin-bottom: 4px;
+}
+
+.chart-bar:hover .chart-bar-tooltip {
+  opacity: 1;
+}
+
+.chart-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.chart-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-dim);
+  flex: 1;
+  text-align: center;
+}
+
+/* Stats row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  animation: slide-up 0.8s ease 0.6s both;
+}
+
+.stat-card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.stat-detail {
+  min-width: 0;
+}
+
+.stat-label {
+  font-family: 'Chakra Petch', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+/* Status bar footer */
+.footer-bar {
+  margin-top: 24px;
+  padding: 14px 24px;
+  border-radius: var(--radius-sm);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slide-up 0.8s ease 0.7s both;
+}
+
+.footer-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.footer-item strong {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.footer-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .grid-main { grid-template-columns: 1fr; }
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .stats-row { grid-template-columns: 1fr; }
+  .energy-value { font-size: 28px; }
+  .header { flex-direction: column; gap: 16px; }
+  .header-right { text-align: left; }
+  body { padding: 12px; }
+}
+</style>
+</head>
+<body>
+
+<div class="dashboard">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="brand-mark">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" stroke="url(#lg)" stroke-width="1.5"/>
+            <path d="M20 8 L24 18 L20 16 L16 18 Z" fill="url(#lg)"/>
+            <path d="M16 22 L20 20 L24 22 L20 32 Z" fill="url(#lg)"/>
+            <defs>
+              <linearGradient id="lg" x1="0" y1="0" x2="40" y2="40">
+                <stop offset="0%" stop-color="#00d4ff"/>
+                <stop offset="100%" stop-color="#2d1be8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">SolarX</div>
+          <div class="brand-sub">Energy Intelligence</div>
+        </div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="energy-now">Energy Now</div>
+      <div class="energy-value">
+        1.2<span class="energy-unit">kW</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- System State -->
+  <div class="state-badge">
+    <span class="state-dot"></span>
+    System Standby · PV Harvesting
+  </div>
+
+  <!-- Main Grid -->
+  <div class="grid-main">
+    <!-- Left Column -->
+    <div class="col-primary">
+      <!-- Energy Orb -->
+      <div class="energy-orb-panel">
+        <div class="orb-container">
+          <div class="orb-ring"></div>
+          <div class="orb-ring"></div>
+          <div class="orb-ring"></div>
+          <div class="orb-core"></div>
+          <div class="orb-core-inner"></div>
+          <div class="orb-center-text">
+            <div class="orb-percent">76</div>
+            <div class="orb-label">State of Charge</div>
+          </div>
+        </div>
+        <div class="particles">
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+          <div class="particle"></div>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-row">
+        <div class="kpi-card kpi-card-pv">
+          <div class="kpi-label">PV Input</div>
+          <div class="kpi-value kpi-value-pv">2.3<span class="kpi-unit">kW</span></div>
+          <div class="kpi-detail">24.9V · 0.0A</div>
+        </div>
+        <div class="kpi-card kpi-card-batt">
+          <div class="kpi-label">Battery</div>
+          <div class="kpi-value kpi-value-batt">76<span class="kpi-unit">%</span></div>
+          <div class="kpi-detail">24.6V · 24V System</div>
+        </div>
+        <div class="kpi-card kpi-card-load">
+          <div class="kpi-label">Load Output</div>
+          <div class="kpi-value kpi-value-load">1.1<span class="kpi-unit">kW</span></div>
+          <div class="kpi-detail">220V · 5.0A</div>
+        </div>
+        <div class="kpi-card kpi-card-temp">
+          <div class="kpi-label">Temperature</div>
+          <div class="kpi-value kpi-value-temp">38<span class="kpi-unit">°C</span></div>
+          <div class="kpi-detail">Controller Ambient</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-secondary">
+      <!-- Battery -->
+      <div class="battery-panel">
+        <div class="battery-title">Battery Bank</div>
+        <div class="battery-visual">
+          <div class="terminal-top"></div>
+          <div class="battery-liquid" id="batteryLiquid"></div>
+          <div class="battery-level-text">
+            <div class="battery-percent">76%</div>
+            <div class="battery-volt">24.6V · Seal · 200Ah</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Energy Flow -->
+      <div class="flow-panel">
+        <div class="flow-title">Power Flow</div>
+        <div class="flow-visual">
+          <div class="flow-node">
+            <div class="flow-icon flow-icon-pv">☀</div>
+            <div class="flow-label">Solar</div>
+          </div>
+          <div class="flow-arrow flow-arrow-active"></div>
+          <div class="flow-node">
+            <div class="flow-icon flow-icon-batt">◆</div>
+            <div class="flow-label">Battery</div>
+          </div>
+          <div class="flow-arrow"></div>
+          <div class="flow-node">
+            <div class="flow-icon flow-icon-load">⚡</div>
+            <div class="flow-label">Load</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-panel">
+    <div class="chart-header">
+      <span class="chart-title">Energy History</span>
+      <div class="chart-tabs">
+        <button class="chart-tab active" data-range="day">Day</button>
+        <button class="chart-tab" data-range="week">Week</button>
+        <button class="chart-tab" data-range="month">Month</button>
+      </div>
+    </div>
+    <div class="chart-bars" id="chartBars"></div>
+    <div class="chart-labels" id="chartLabels"></div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(255,179,71,0.15);">☀</div>
+      <div class="stat-detail">
+        <div class="stat-label">Today Generation</div>
+        <div class="stat-value">0.01 kWh</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(0,212,255,0.15);">⟳</div>
+      <div class="stat-detail">
+        <div class="stat-label">Total Lifetime</div>
+        <div class="stat-value">0.50 kWh</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(204,102,255,0.15);">◈</div>
+      <div class="stat-detail">
+        <div class="stat-label">Device Model</div>
+        <div class="stat-value">HM-6096</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer-bar">
+    <div class="footer-item">
+      <span class="footer-dot" style="background:var(--cyan);box-shadow:0 0 6px var(--cyan);"></span>
+      Connected
+      <strong id="deviceMac">E4:AE:E4:F3:98:6E</strong>
+    </div>
+    <div class="footer-item">
+      RSSI <strong id="rssiValue">-32 dBm</strong>
+    </div>
+    <div class="footer-item">
+      Timezone <strong>Asia/Bangkok</strong>
+    </div>
+  </div>
+</div>
+
+<script>
+const historyData = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 14, 32, 14, 3, 0, 0, 0, 0, 0];
+const hours = Array.from({length: 24}, (_, i) => `${i}:00`);
+
+function renderChart(activeRange) {
+  const container = document.getElementById('chartBars');
+  const labelContainer = document.getElementById('chartLabels');
+
+  let data, labels;
+  if (activeRange === 'day') {
+    data = historyData;
+    labels = hours.filter((_, i) => i % 4 === 0);
+  } else if (activeRange === 'week') {
+    const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+    data = days.map(() => Math.round(Math.random() * 20 + 10));
+    labels = days;
+  } else {
+    data = Array.from({length: 30}, () => Math.round(Math.random() * 20 + 5));
+    labels = data.map((_, i) => i % 5 === 0 ? `D${i+1}` : '');
+  }
+
+  const max = Math.max(...data, 1);
+  const min = Math.min(...data, 0);
+  const range = max - min || 1;
+
+  container.innerHTML = data.map((v, i) => {
+    const pct = ((v - min) / range) * 100;
+    const hue = 210 + (pct / 100) * 40;
+    const bg = pct > 60
+      ? `linear-gradient(180deg, ${gradientColor(pct/100)}, ${gradientColor(pct/100 * 0.6)})`
+      : `linear-gradient(180deg, rgba(0,212,255,${0.2 + pct/100 * 0.6}), rgba(45,27,232,${0.3 + pct/100 * 0.5}))`;
+    return `<div class="chart-bar" style="height:${Math.max(pct, 4)}%;background:${bg}">
+      <div class="chart-bar-tooltip">${v.toFixed(1)} W</div>
+    </div>`;
+  }).join('');
+
+  labelContainer.innerHTML = labels.map((l, i) =>
+    `<div class="chart-label">${l}</div>`
+  ).join('');
+}
+
+function gradientColor(t) {
+  const r = Math.round(0 + t * 0 + (1-t) * 0);
+  const g = Math.round(212 + t * (100-212) + (1-t) * 212);
+  const b = Math.round(255 + t * (200-255) + (1-t) * 255);
+  return `rgb(${r},${g},${b})`;
+}
+
+// Init chart
+renderChart('day');
+
+// Chart tabs
+document.querySelectorAll('.chart-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    renderChart(tab.dataset.range);
+  });
+});
+</script>
+
+</body>
+</html>

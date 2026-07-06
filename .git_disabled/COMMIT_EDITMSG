@@ -1,0 +1,12 @@
+@
+fix(tuya): remove duplicate system_voltage from settingsToCommands
+
+- system_voltage is not a recognized DP code for
+  MPPT HM-6096, only battery_voltage_class is used.
+- Sending unknown codes caused device to reject the
+  entire commands payload.
+- Also add optional nonce param to buildSign for
+  Tuya spec compliance (default "" for compat).
+
+Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+@

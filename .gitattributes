@@ -1,0 +1,5 @@
+* text=auto eol=lf
+
+# Binary-ish files — don't normalize
+bun.lock binary
+*.lock binary

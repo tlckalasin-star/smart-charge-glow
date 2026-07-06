@@ -1,0 +1,350 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+@import "@fontsource/ibm-plex-sans-thai/300.css";
+@import "@fontsource/ibm-plex-sans-thai/400.css";
+@import "@fontsource/ibm-plex-sans-thai/500.css";
+@import "@fontsource/ibm-plex-sans-thai/600.css";
+@import "@fontsource/ibm-plex-sans-thai/700.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/600.css";
+@import "@fontsource/jetbrains-mono/700.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "IBM Plex Sans Thai", "JetBrains Mono", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-solar: var(--solar);
+  --color-solar-glow: var(--solar-glow);
+  --color-battery: var(--battery);
+  --color-battery-glow: var(--battery-glow);
+  --color-load: var(--load);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+}
+
+:root {
+  --radius: 1rem;
+  
+  /* Enhanced Solar Glow Dark Theme */
+  --background: oklch(0.13 0.02 260);
+  --foreground: oklch(0.98 0.005 250);
+  
+  /* Layered surfaces for depth */
+  --surface: oklch(0.18 0.025 260);
+  --surface-2: oklch(0.22 0.03 260);
+  --surface-3: oklch(0.26 0.035 260);
+  
+  /* Cards with subtle warmth */
+  --card: oklch(0.2 0.025 260);
+  --card-foreground: oklch(0.98 0.005 250);
+  
+  /* Popover */
+  --popover: oklch(0.2 0.025 260);
+  --popover-foreground: oklch(0.98 0.005 250);
+  
+  /* Primary - Vibrant blue-purple gradient feel */
+  --primary: oklch(0.68 0.18 275);
+  --primary-foreground: oklch(0.15 0.02 260);
+  
+  /* Secondary */
+  --secondary: oklch(0.28 0.03 260);
+  --secondary-foreground: oklch(0.95 0.01 250);
+  
+  /* Muted */
+  --muted: oklch(0.25 0.025 260);
+  --muted-foreground: oklch(0.65 0.02 260);
+  
+  /* Accent */
+  --accent: oklch(0.28 0.03 260);
+  --accent-foreground: oklch(0.95 0.01 250);
+  
+  /* Destructive */
+  --destructive: oklch(0.65 0.22 25);
+  --destructive-foreground: oklch(0.98 0.005 250);
+  
+  /* Borders - more subtle */
+  --border: oklch(1 0 0 / 6%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.78 0.18 70);
+  
+  /* Energy colors - enhanced vibrancy */
+  --solar: oklch(0.8 0.18 70);
+  --solar-glow: oklch(0.88 0.2 75);
+  --battery: oklch(0.75 0.19 155);
+  --battery-glow: oklch(0.85 0.2 160);
+  --load: oklch(0.72 0.16 125);
+}
+
+.dark {
+  --background: oklch(0.13 0.02 260);
+  --foreground: oklch(0.98 0.005 250);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  
+  html, body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  .font-mono, code, pre {
+    font-family: var(--font-mono);
+  }
+  
+  /* Smooth transitions for interactive elements */
+  button, a, input, select {
+    transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    button, a, input, select {
+      transition-duration: 0.01ms;
+    }
+  }
+  
+  /* Focus styles */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Glass morphism utilities */
+@utility glass {
+  background: oklch(0.2 0.025 260 / 0.6);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid oklch(1 0 0 / 8%);
+}
+
+@utility glass-subtle {
+  background: oklch(0.18 0.025 260 / 0.4);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid oklch(1 0 0 / 5%);
+}
+
+@utility glass-strong {
+  background: oklch(0.22 0.03 260 / 0.8);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid oklch(1 0 0 / 10%);
+}
+
+/* Glow effects */
+@utility glow-solar {
+  box-shadow: 
+    0 0 40px -10px oklch(0.8 0.18 70 / 0.35),
+    0 0 80px -20px oklch(0.8 0.18 70 / 0.15);
+}
+
+@utility glow-battery {
+  box-shadow: 
+    0 0 40px -10px oklch(0.75 0.19 155 / 0.35),
+    0 0 80px -20px oklch(0.75 0.19 155 / 0.15);
+}
+
+@utility glow-primary {
+  box-shadow: 
+    0 0 40px -10px oklch(0.68 0.18 275 / 0.4),
+    0 0 80px -20px oklch(0.68 0.18 275 / 0.2);
+}
+
+@utility glow-load {
+  box-shadow: 
+    0 0 40px -10px oklch(0.72 0.16 125 / 0.35),
+    0 0 80px -20px oklch(0.72 0.16 125 / 0.15);
+}
+
+/* Card hover effects */
+@utility card-interactive {
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (hover: hover) {
+  .card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px -10px oklch(0 0 0 / 0.3);
+  }
+}
+
+.card-interactive:active {
+  transform: translateY(0);
+}
+
+/* Gradient backgrounds */
+@utility gradient-primary {
+  background: linear-gradient(
+    135deg,
+    oklch(0.68 0.18 275 / 0.25) 0%,
+    oklch(0.5 0.15 280 / 0.15) 100%
+  );
+}
+
+@utility gradient-solar {
+  background: linear-gradient(
+    135deg,
+    oklch(0.8 0.18 70 / 0.2) 0%,
+    oklch(0.7 0.15 65 / 0.1) 100%
+  );
+}
+
+@utility gradient-battery {
+  background: linear-gradient(
+    135deg,
+    oklch(0.75 0.19 155 / 0.2) 0%,
+    oklch(0.65 0.15 150 / 0.1) 100%
+  );
+}
+
+@utility gradient-surface {
+  background: linear-gradient(
+    180deg,
+    var(--color-surface-2) 0%,
+    var(--color-surface) 100%
+  );
+}
+
+/* Animations */
+@utility animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@utility animate-fade-in {
+  animation: fade-in 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-slide-up {
+  animation: slide-up 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shimmer effect for loading states */
+@utility shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 0%,
+    var(--color-surface-2) 50%,
+    var(--color-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Reduced motion: override all animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Scrollbar styling */
+@layer base {
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: oklch(1 0 0 / 15%);
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: oklch(1 0 0 / 25%);
+  }
+}
