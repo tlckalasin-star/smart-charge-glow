@@ -182,6 +182,8 @@ function HistoryPage() {
           />
           <Stat label="อุณหภูมิ" value={status.data ? `${status.data.temperature}°C` : "-"} />
         </div>
+
+        <MonthlyReceipt />
       </div>
     </AppShell>
   );
